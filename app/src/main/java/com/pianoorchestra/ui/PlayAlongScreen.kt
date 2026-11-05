@@ -32,6 +32,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.FiberManualRecord
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Headphones
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -148,6 +150,7 @@ private fun SongList(
     onImport: () -> Unit, onOpen: (SongLibrary.Entry) -> Unit, onDeleted: () -> Unit,
 ) {
     val mine = remember(refresh) { app.library.imported() }
+    val context = LocalContext.current
     var toDelete by remember { mutableStateOf<SongLibrary.Entry?>(null) }
     Column(Modifier.fillMaxSize()) {
         TopBar(stringResource(R.string.songs_title), onBack) {
@@ -165,7 +168,11 @@ private fun SongList(
         ) {
             if (mine.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_mine), Modifier.padding(top = 8.dp)) }
-                items(mine, key = { it.id }) { e -> SongCard(e, lang, onClick = { onOpen(e) }, onDelete = { toDelete = e }) }
+                items(mine, key = { it.id }) { e ->
+                    SongCard(e, lang, onClick = { onOpen(e) }, onDelete = { toDelete = e }, onShare = {
+                        app.library.shareIntent(e)?.let { context.startActivity(android.content.Intent.createChooser(it, null)) }
+                    })
+                }
             }
             item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_builtin), Modifier.padding(top = 8.dp)) }
             items(app.library.builtIn, key = { it.id }) { e -> SongCard(e, lang, onClick = { onOpen(e) }) }
@@ -183,7 +190,7 @@ private fun SongList(
 }
 
 @Composable
-private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, onDelete: (() -> Unit)? = null) {
+private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, onDelete: (() -> Unit)? = null, onShare: (() -> Unit)? = null) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -203,6 +210,9 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
             Text(e.title(lang), color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(e.style(lang), color = Po.Muted, fontSize = 16.sp)
         }
+        if (onShare != null) {
+            IconButton(onClick = onShare) { Icon(Icons.Rounded.Share, stringResource(R.string.share), tint = Po.Muted) }
+        }
         if (onDelete != null) {
             IconButton(onClick = onDelete) { Icon(Icons.Rounded.Delete, stringResource(R.string.delete_song), tint = Po.Muted) }
         }
@@ -216,15 +226,32 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
     val guide by app.player.guide.collectAsState()
     val keys by app.live.keys.collectAsState()
     val names = stringArrayResource(R.array.note_names)
+    val context = LocalContext.current
 
     val parts = remember(song) { song.parts.filter { it.noteCount > 0 } }
     var userPart by remember(song) { mutableIntStateOf(defaultUserPart(song)) }
     val muted = remember(song) { mutableStateListOf(*Array(song.parts.size) { false }) }
     val solo = remember(song) { mutableStateListOf(*Array(song.parts.size) { false }) }
     val volume = remember(song) { mutableStateListOf(*Array(song.parts.size) { 1f }) }
-    var tempo by remember { mutableFloatStateOf(app.player.tempoFactor.toFloat()) }
     var countIn by remember { mutableStateOf(app.player.countIn) }
+    var waitMode by remember { mutableStateOf(false) }
+    var progressive by remember { mutableStateOf(app.player.progressive) }
     var seeking by remember { mutableStateOf<Float?>(null) }
+    var tempoDrag by remember { mutableStateOf<Float?>(null) }
+    var loopA by remember(song) { mutableStateOf(-1.0) }
+
+    // une prise vient d'être enregistrée : on l'annonce
+    val saved by app.lastSaved.collectAsState()
+    LaunchedEffect(saved) {
+        saved?.let {
+            Toast.makeText(context, context.getString(R.string.recorded, it), Toast.LENGTH_LONG).show()
+            app.lastSaved.value = null
+        }
+    }
+    LaunchedEffect(Unit) { app.player.setWaitMode(false) }
+
+    val section = song.sectionAt(state.position)
+    val (chordNow, chordNext) = song.chordAt(state.position)
 
     Column(Modifier.fillMaxSize()) {
         TopBar(song.name, onBack)
@@ -245,16 +272,36 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
                                         stringResource(if (state.playing) R.string.stop else R.string.play),
                                         tint = Po.Night, modifier = Modifier.size(52.dp))
                                 }
-                                Spacer(Modifier.width(16.dp))
+                                Spacer(Modifier.width(12.dp))
                                 Box(
                                     Modifier.size(60.dp).clip(CircleShape).background(Po.CardHigh)
                                         .clickable { app.player.restart() },
                                     contentAlignment = Alignment.Center
                                 ) { Icon(Icons.Rounded.Replay, stringResource(R.string.restart), tint = Po.Text, modifier = Modifier.size(32.dp)) }
-                                Spacer(Modifier.width(20.dp))
-                                Column {
-                                    Text("${time(state.position)} / ${time(song.duration)}", color = Po.Text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
-                                    Text(stringResource(R.string.song_info, (song.bpm * tempo).toInt(), "${song.beatsPerBar}/4"), color = Po.Muted, fontSize = 16.sp)
+                                Spacer(Modifier.width(12.dp))
+                                Box(
+                                    Modifier.size(60.dp).clip(CircleShape)
+                                        .background(if (state.recording) Po.Danger else Po.CardHigh)
+                                        .clickable { if (state.recording) app.player.stopRecording() else { app.player.startRecording(); if (!state.playing) app.player.play() } },
+                                    contentAlignment = Alignment.Center
+                                ) { Icon(Icons.Rounded.FiberManualRecord, stringResource(R.string.record),
+                                    tint = if (state.recording) Po.Text else Po.Danger, modifier = Modifier.size(30.dp)) }
+                                Spacer(Modifier.width(16.dp))
+                                Column(Modifier.weight(1f)) {
+                                    Text("${MusicText.time(state.position)} / ${MusicText.time(song.duration)}", color = Po.Text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
+                                    Text(stringResource(R.string.song_info, (song.bpm * state.tempo).toInt(), "${song.beatsPerBar}/4"), color = Po.Muted, fontSize = 16.sp)
+                                    when {
+                                        state.recording -> Text(stringResource(R.string.recording), color = Po.Danger, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                        state.waiting -> Text(stringResource(R.string.waiting), color = Po.Gold, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                                        section != null -> Text(MusicText.section(section.name, lang), color = Po.Teal, fontSize = 16.sp)
+                                    }
+                                }
+                                // l'accord du moment, en grand, et le suivant
+                                if (chordNow != null) {
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(MusicText.chord(chordNow.name, lang), color = Po.Gold, fontSize = 34.sp, fontWeight = FontWeight.Bold)
+                                        if (chordNext != null) Text("→ " + MusicText.chord(chordNext.name, lang), color = Po.Muted, fontSize = 18.sp)
+                                    }
                                 }
                             }
                             Slider(
@@ -265,23 +312,56 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
                             )
                         }
                     }
-                    // tempo et décompte
+                    // parties du morceau (repères)
+                    if (song.sections.isNotEmpty()) {
+                        Panel(Modifier.fillMaxWidth()) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                SectionTitle(stringResource(R.string.sections))
+                                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    for (sec in song.sections) {
+                                        Chip(MusicText.section(sec.name, lang), selected = sec == section) { app.player.seek(sec.start) }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    // travailler : tempo, attente, boucle
                     Panel(Modifier.fillMaxWidth()) {
-                        Column {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            SectionTitle(stringResource(R.string.practice))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(stringResource(R.string.tempo), color = Po.Text, fontSize = 20.sp, modifier = Modifier.weight(1f))
-                                Text(stringResource(R.string.tempo_value, (tempo * 100).toInt()), color = Po.Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.tempo_value, ((tempoDrag ?: state.tempo.toFloat()) * 100).toInt()), color = Po.Gold, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                             }
                             Slider(
-                                value = tempo, valueRange = 0.5f..1.2f, steps = 13,
-                                onValueChange = { tempo = it; app.player.tempoFactor = it.toDouble() },
+                                value = tempoDrag ?: state.tempo.toFloat(), valueRange = 0.5f..1.2f, steps = 13,
+                                onValueChange = { tempoDrag = it; app.player.setTempo(it.toDouble()) },
+                                onValueChangeFinished = { tempoDrag = null },
                                 colors = SliderDefaults.colors(thumbColor = Po.Gold, activeTrackColor = Po.Gold, inactiveTrackColor = Po.Stroke)
                             )
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(stringResource(R.string.countin), color = Po.Text, fontSize = 18.sp, modifier = Modifier.weight(1f))
-                                Switch(countIn, { countIn = it; app.player.countIn = it },
-                                    colors = SwitchDefaults.colors(checkedThumbColor = Po.Night, checkedTrackColor = Po.Teal))
+                            SwitchRow(stringResource(R.string.countin), null, countIn) { countIn = it; app.player.countIn = it }
+                            SwitchRow(stringResource(R.string.wait_mode), stringResource(R.string.wait_mode_sub), waitMode) { waitMode = it; app.player.setWaitMode(it) }
+                            SwitchRow(stringResource(R.string.progressive), stringResource(R.string.progressive_sub), progressive) { progressive = it; app.player.progressive = it }
+                            Text(stringResource(R.string.loop), color = Po.Text, fontSize = 20.sp, modifier = Modifier.padding(top = 6.dp))
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                Chip(stringResource(R.string.loop_a), selected = loopA >= 0 && !state.looping) {
+                                    loopA = state.position
+                                }
+                                Chip(stringResource(R.string.loop_b), selected = false) {
+                                    if (loopA >= 0 && state.position > loopA + 0.5) { app.player.setLoop(loopA, state.position); loopA = -1.0 }
+                                }
+                                if (section != null) Chip(stringResource(R.string.loop_section), selected = state.looping &&
+                                        kotlin.math.abs(state.loopStart - section.start) < 0.05) {
+                                    app.player.setLoop(section.start, section.end)
+                                }
+                                Chip(stringResource(R.string.loop_off), selected = !state.looping && loopA < 0) {
+                                    loopA = -1.0; app.player.setLoop(-1.0, -1.0)
+                                }
                             }
+                            if (state.looping) Text(
+                                stringResource(R.string.loop_info, MusicText.time(state.loopStart), MusicText.time(state.loopEnd), state.loops),
+                                color = Po.Teal, fontSize = 16.sp
+                            )
                         }
                     }
                     // ma partie
@@ -337,6 +417,17 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
         Spacer(Modifier.height(12.dp))
         PianoKeyboard(live = keys, guide = guide, noteNames = names,
             onNoteOn = { app.screenNoteOn(it) }, onNoteOff = { app.screenNoteOff(it) })
+    }
+}
+
+@Composable
+fun SwitchRow(title: String, subtitle: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { onChange(!checked) }.padding(vertical = 4.dp)) {
+        Column(Modifier.weight(1f)) {
+            Text(title, color = Po.Text, fontSize = 18.sp)
+            if (subtitle != null) Text(subtitle, color = Po.Muted, fontSize = 14.sp)
+        }
+        Switch(checked, onChange, colors = SwitchDefaults.colors(checkedThumbColor = Po.Night, checkedTrackColor = Po.Teal))
     }
 }
 
@@ -404,9 +495,4 @@ fun partLabel(p: Part): String {
         else -> R.string.fam_other
     }
     return if (role != null) "${stringResource(role)} · ${stringResource(fam)}" else stringResource(fam)
-}
-
-private fun time(s: Double): String {
-    val t = s.toInt().coerceAtLeast(0)
-    return "%d:%02d".format(t / 60, t % 60)
 }

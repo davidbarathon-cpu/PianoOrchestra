@@ -53,7 +53,37 @@ class SongLibrary(private val context: Context) {
             e.file != null -> e.file.readBytes()
             else -> error("vide")
         }
-        return Song.parse(bytes, e.title(lang))
+        val song = Song.parse(bytes, e.title(lang))
+        // la grille d'accords de Riffmaker, si le plan accompagne le morceau
+        val plan = when {
+            e.asset != null -> runCatching { context.assets.open(e.asset.removeSuffix(".mid") + ".plan.json").use { it.readBytes() } }.getOrNull()
+            e.file != null -> File(e.file.parentFile, e.file.nameWithoutExtension + ".plan.json").takeIf { it.exists() }?.readBytes()
+            else -> null
+        }
+        if (plan != null) runCatching { song.attachPlan(String(plan, Charsets.UTF_8)) }
+        return song
+    }
+
+    /** Garde un enregistrement dans « Mes morceaux ». Renvoie son titre. */
+    fun saveRecording(bytes: ByteArray, base: String): String {
+        val stamp = java.text.SimpleDateFormat("d MMM HH'h'mm", java.util.Locale.FRANCE).format(java.util.Date())
+        var name = "$base - $stamp".replace(Regex("[\\\\/:*?\"<>|]"), "_")
+        var f = File(dir, "$name.mid")
+        var k = 2
+        while (f.exists()) { f = File(dir, "$name ($k).mid"); k++ }
+        f.writeBytes(bytes)
+        return f.nameWithoutExtension
+    }
+
+    /** Envoyer un morceau à une autre app (e-mail, Drive, Riffmaker…). */
+    fun shareIntent(e: Entry): android.content.Intent? {
+        val f = e.file ?: return null
+        val uri = androidx.core.content.FileProvider.getUriForFile(context, "${context.packageName}.files", f)
+        return android.content.Intent(android.content.Intent.ACTION_SEND)
+            .setType("audio/midi")
+            .putExtra(android.content.Intent.EXTRA_STREAM, uri)
+            .putExtra(android.content.Intent.EXTRA_SUBJECT, f.nameWithoutExtension)
+            .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
     }
 
     /** Copie un fichier MIDI choisi par l'utilisatrice dans la bibliothèque. Renvoie son titre, ou null. */

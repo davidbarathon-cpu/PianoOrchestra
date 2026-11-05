@@ -25,7 +25,53 @@ class Song(
     private val tempos: List<Pair<Double, Double>>,
     val beatsPerBar: Int,
     val name: String,
+    /** Les repères du fichier (Intro, Couplet 1, Refrain…), triés. */
+    val sections: List<Section> = emptyList(),
+    private val tpq: Int = 480,
+    private val tickSeconds: (Long) -> Double = { it * 0.5 / 480 },
 ) {
+    class Section(val name: String, val start: Double, val end: Double)
+    class Chord(val time: Double, val name: String)
+
+    /** La grille d'accords (lue dans le plan.json de Riffmaker quand il existe). */
+    var chords: List<Chord> = emptyList()
+        private set
+
+    /** La section qui contient [time], ou null. */
+    fun sectionAt(time: Double): Section? = sections.lastOrNull { it.start <= time + 0.01 }
+
+    /** L'accord qui sonne à [time] et le suivant. */
+    fun chordAt(time: Double): Pair<Chord?, Chord?> {
+        var cur: Chord? = null
+        var next: Chord? = null
+        for (c in chords) {
+            if (c.time <= time + 0.02) cur = c else { next = c; break }
+        }
+        return cur to next
+    }
+
+    /** Lit la grille d'un plan.json de Riffmaker : sections, mesures, accords (un ou deux par mesure). */
+    fun attachPlan(planJson: String) {
+        val plan = Json.parse(planJson) as? Map<*, *> ?: return
+        val secs = plan["sections"] as? List<*> ?: return
+        val out = ArrayList<Chord>()
+        var bar = 0L
+        val barTicks = beatsPerBar.toLong() * tpq
+        for (sec in secs) {
+            val m = sec as? Map<*, *> ?: continue
+            val bars = (m["mesures"] as? Double)?.toInt() ?: continue
+            val acc = m["accords"] as? List<*> ?: emptyList<Any>()
+            for (k in 0 until bars) {
+                val names = (acc.getOrNull(k) as? String)?.split(' ')?.filter { it.isNotBlank() } ?: emptyList()
+                names.forEachIndexed { j, n ->
+                    val tick = (bar + k) * barTicks + j * barTicks / names.size
+                    if (out.lastOrNull()?.name != n) out.add(Chord(tickSeconds(tick), n))
+                }
+            }
+            bar += bars
+        }
+        chords = out
+    }
     /** Le tempo au début, en battements par minute. */
     val bpm: Int get() = (60.0 / beatSecondsAt(0.0)).toInt()
 
@@ -73,6 +119,7 @@ class Song(
             val raws = ArrayList<Raw>()
             val tempoTicks = ArrayList<Pair<Long, Int>>()     // (tick, microsecondes par noire)
             val trackNames = HashMap<Int, String>()
+            val markers = ArrayList<Pair<Long, String>>()
             var beatsPerBar = 4
             var order = 0
 
@@ -113,6 +160,7 @@ class Song(
                                     0x51 -> if (l >= 3) tempoTicks.add(tick to (((data[ms].toInt() and 0xFF) shl 16) or
                                         ((data[ms + 1].toInt() and 0xFF) shl 8) or (data[ms + 2].toInt() and 0xFF)))
                                     0x03 -> if (!trackNames.containsKey(track)) trackNames[track] = text(data, ms, l)
+                                    0x06 -> if (l > 0) markers.add(tick to text(data, ms, l))
                                     0x58 -> if (l >= 1 && tick == 0L) beatsPerBar = (data[ms].toInt() and 0xFF).coerceIn(1, 12)
                                     0x2F -> q = end
                                 }
@@ -181,7 +229,18 @@ class Song(
                 events.add(SongEvent(t, pi, r.status, r.d1, r.d2))
                 if (t > duration) duration = t
             }
-            return Song(parts, events, duration, tempoSec, beatsPerBar, name)
+            markers.sortBy { it.first }
+            val sections = markers.mapIndexed { k, (tk, txt) ->
+                Section(txt, seconds(tk), if (k + 1 < markers.size) seconds(markers[k + 1].first) else duration)
+            }.filter { it.end > it.start }
+            val tt = ArrayList(tempoTicks)
+            val ss = segStartSec.copyOf()
+            val toSec: (Long) -> Double = { tick ->
+                var k = 0
+                while (k + 1 < tt.size && tt[k + 1].first <= tick) k++
+                ss[k] + (tick - tt[k].first) * tt[k].second / 1e6 / tpq
+            }
+            return Song(parts, events, duration, tempoSec, beatsPerBar, name, sections, tpq, toSec)
         }
     }
 }

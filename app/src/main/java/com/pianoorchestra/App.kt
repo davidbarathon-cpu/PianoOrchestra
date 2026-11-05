@@ -68,6 +68,33 @@ class LiveInput {
     }
 }
 
+/** Enregistre tout ce qui est joué au piano, sans orchestre. */
+class FreeRecorder {
+    val activeFlow = MutableStateFlow(false)
+    val active: Boolean get() = activeFlow.value
+    private var t0 = 0L
+    private val events = ArrayList<com.pianoorchestra.player.MidiWriter.Event>()
+
+    @Synchronized fun start() { events.clear(); t0 = System.nanoTime(); activeFlow.value = true }
+
+    @Synchronized fun onMidi(status: Int, d1: Int, d2: Int) {
+        if (!active || (status and 0x0F) == 9) return
+        val kind = status and 0xF0
+        if (kind == 0x90 || kind == 0x80 || (kind == 0xB0 && d1 == 64)) {
+            events.add(com.pianoorchestra.player.MidiWriter.Event((System.nanoTime() - t0) / 1e9, status, d1, d2))
+        }
+    }
+
+    @Synchronized fun stop(): ByteArray? {
+        activeFlow.value = false
+        if (events.none { (it.status and 0xF0) == 0x90 }) return null
+        val first = events.first().time - 0.5
+        val shifted = events.map { com.pianoorchestra.player.MidiWriter.Event(it.time - first, it.status, it.d1, it.d2) }
+        return com.pianoorchestra.player.MidiWriter.write(
+            listOf(com.pianoorchestra.player.MidiWriter.Track("Bermet", 0, 0, shifted)), "Bermet")
+    }
+}
+
 class App : Application() {
 
     enum class SoundState { LOADING, READY, ERROR }
@@ -99,6 +126,8 @@ class App : Application() {
 
         midi.addListener { s, a, b ->
             live.onMidi(s, a, b)
+            player.onLive(s, a, b)
+            recorder.onMidi(s, a, b)
             val s2 = synth ?: return@addListener
             if (!prefs.echo) return@addListener
             val kind = s and 0xF0
@@ -108,6 +137,7 @@ class App : Application() {
             }
         }
         midi.start()
+        player.onRecorded = { bytes, title -> saveTake(bytes, title) }
         loadSounds()
         updater.check(quiet = true)
     }
@@ -145,6 +175,24 @@ class App : Application() {
     fun setMasterVolume(v: Float) {
         prefs.masterVolume = v
         synth?.masterGain = v
+    }
+
+    /** Le dernier enregistrement gardé (pour l'annoncer à l'écran). */
+    val lastSaved = MutableStateFlow<String?>(null)
+    val recorder = FreeRecorder()
+
+    private fun saveTake(bytes: ByteArray, title: String) {
+        val prefix = getString(R.string.take_prefix)
+        val name = library.saveRecording(bytes, "$prefix - $title")
+        lastSaved.value = name
+    }
+
+    /** Enregistrement libre (écran Clavier) : démarrer, arrêter et garder. */
+    fun toggleFreeRecording() {
+        if (recorder.active) {
+            val bytes = recorder.stop() ?: return
+            saveTake(bytes, getString(R.string.take_free))
+        } else recorder.start()
     }
 
     /** Le clavier à l'écran joue sur la tablette. */

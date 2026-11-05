@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.rounded.FiberManualRecord
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -58,6 +61,15 @@ fun KeyboardScreen(app: App, lang: String, onBack: () -> Unit) {
     val names = stringArrayResource(R.array.note_names)
     var echo by remember { mutableStateOf(app.prefs.echo) }
     var program by remember { mutableIntStateOf(app.prefs.echoProgram) }
+    val recording by app.recorder.activeFlow.collectAsState()
+    val saved by app.lastSaved.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
+    androidx.compose.runtime.LaunchedEffect(saved) {
+        saved?.let {
+            android.widget.Toast.makeText(context, context.getString(R.string.recorded, it), android.widget.Toast.LENGTH_LONG).show()
+            app.lastSaved.value = null
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopBar(stringResource(R.string.menu_keyboard), onBack)
@@ -91,6 +103,23 @@ fun KeyboardScreen(app: App, lang: String, onBack: () -> Unit) {
                             }
                         }
                         Text(stringResource(R.string.demo_hint), color = Po.Muted, fontSize = 15.sp)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Column(Modifier.weight(1f)) {
+                                Text(stringResource(if (recording) R.string.recording else R.string.record),
+                                    color = if (recording) Po.Danger else Po.Text, fontSize = 20.sp)
+                                Text(stringResource(R.string.record_free_sub), color = Po.Muted, fontSize = 15.sp)
+                            }
+                            androidx.compose.foundation.layout.Box(
+                                Modifier.size(56.dp).clip(androidx.compose.foundation.shape.CircleShape)
+                                    .background(if (recording) Po.Danger else Po.CardHigh)
+                                    .clickable { app.toggleFreeRecording() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                androidx.compose.material3.Icon(
+                                    if (recording) androidx.compose.material.icons.Icons.Rounded.Stop else androidx.compose.material.icons.Icons.Rounded.FiberManualRecord,
+                                    stringResource(R.string.record), tint = if (recording) Po.Text else Po.Danger)
+                            }
+                        }
                     }
                 }
             }

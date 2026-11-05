@@ -116,6 +116,28 @@
     <string name="credits">Sons : GeneralUser GS, par S. Christian Collins (licence libre). Morceaux fournis : composés avec Riffmaker.</string>
 
     <!-- Noms des notes : do ré mi… -->
+    <!-- Travailler -->
+    <string name="practice">Travailler</string>
+    <string name="wait_mode">Attends-moi</string>
+    <string name="wait_mode_sub">L’orchestre attend que tu joues la bonne note.</string>
+    <string name="waiting">J’attends ta note…</string>
+    <string name="progressive">Tempo progressif</string>
+    <string name="progressive_sub">+5 % à chaque tour de boucle, jusqu’à 100 %.</string>
+    <string name="loop">Boucle</string>
+    <string name="loop_a">Début ici</string>
+    <string name="loop_b">Fin ici</string>
+    <string name="loop_off">Sans boucle</string>
+    <string name="loop_section">Boucler cette partie</string>
+    <string name="loop_info">%1$s → %2$s · %3$d tours</string>
+    <string name="sections">Parties du morceau</string>
+    <string name="record">Enregistrer</string>
+    <string name="recording">Enregistrement…</string>
+    <string name="recorded">Prise enregistrée : %1$s</string>
+    <string name="share">Envoyer</string>
+    <string name="take_prefix">Prise</string>
+    <string name="take_free">Jeu libre</string>
+    <string name="record_free_sub">Enregistre ce que tu joues ; la prise s’ajoute à « Mes morceaux ».</string>
+
     <string-array name="note_names">
         <item>do</item>
         <item>do♯</item>

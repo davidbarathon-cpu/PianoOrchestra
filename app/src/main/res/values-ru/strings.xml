@@ -109,6 +109,28 @@
     <string name="update_allow">Разреши установку для Piano Orchestra, затем вернись и снова нажми «Установить».</string>
     <string name="credits">Звуки: GeneralUser GS, автор S. Christian Collins (свободная лицензия). Встроенные песни созданы в Riffmaker.</string>
 
+    <!-- Занятие -->
+    <string name="practice">Занятие</string>
+    <string name="wait_mode">Подожди меня</string>
+    <string name="wait_mode_sub">Оркестр ждёт, пока ты сыграешь нужную ноту.</string>
+    <string name="waiting">Жду твою ноту…</string>
+    <string name="progressive">Постепенное ускорение</string>
+    <string name="progressive_sub">+5 % после каждого круга, до 100 %.</string>
+    <string name="loop">Повтор</string>
+    <string name="loop_a">Начало здесь</string>
+    <string name="loop_b">Конец здесь</string>
+    <string name="loop_off">Без повтора</string>
+    <string name="loop_section">Повторять эту часть</string>
+    <string name="loop_info">%1$s → %2$s · кругов: %3$d</string>
+    <string name="sections">Части песни</string>
+    <string name="record">Записать</string>
+    <string name="recording">Идёт запись…</string>
+    <string name="recorded">Запись сохранена: %1$s</string>
+    <string name="share">Отправить</string>
+    <string name="take_prefix">Запись</string>
+    <string name="take_free">Свободная игра</string>
+    <string name="record_free_sub">Запиши свою игру; запись появится в «Мои песни».</string>
+
     <string-array name="note_names">
         <item>до</item>
         <item>до♯</item>
