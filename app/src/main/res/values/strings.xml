@@ -163,6 +163,8 @@
     <string name="chord_hint">Joue un accord de la main gauche…</string>
     <string name="bpm_value">%1$d BPM</string>
 
+    <string name="songs_scores">Partitions</string>
+
     <string-array name="note_names">
         <item>do</item>
         <item>do♯</item>

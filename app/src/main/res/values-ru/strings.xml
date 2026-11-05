@@ -156,6 +156,8 @@
     <string name="chord_hint">Сыграй аккорд левой рукой…</string>
     <string name="bpm_value">%1$d уд/мин</string>
 
+    <string name="songs_scores">Ноты</string>
+
     <string-array name="note_names">
         <item>до</item>
         <item>до♯</item>

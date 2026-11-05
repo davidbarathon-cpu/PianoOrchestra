@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  html, body { margin: 0; padding: 0; background: #F7F4EC; }
+  #wrap { position: relative; }
+  #score { padding: 8px 0 120px; }
+  #cursor {
+    position: absolute; width: 6px; border-radius: 3px; background: rgba(232, 184, 109, 0.75);
+    box-shadow: 0 0 12px rgba(232, 184, 109, 0.9); pointer-events: none; display: none; transition: left 0.08s linear;
+  }
+  #bar { position: absolute; background: rgba(94, 211, 195, 0.12); pointer-events: none; display: none; border-radius: 6px; }
+  #msg { font: 18px sans-serif; color: #666; padding: 24px; }
+</style>
+<script src="alphaTab.min.js"></script>
+</head>
+<body>
+<div id="wrap">
+  <div id="bar"></div>
+  <div id="cursor"></div>
+  <div id="score"><div id="msg">…</div></div>
+</div>
+<script>
+// Partition et tablature : alphaTab dessine, Piano Orchestra joue (l'orchestre, l'attente, le mixeur).
+// Le curseur est placé par l'application à partir du temps du morceau.
+var po = (function () {
+  var api = null, lookup = null, allTracks = null, lastBeat = null;
+  var el = document.getElementById('score');
+  var cursor = document.getElementById('cursor');
+  var barEl = document.getElementById('bar');
+
+  function b64ToBytes(b64) {
+    var bin = atob(b64), out = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  function bytesToB64(bytes) {
+    var s = '', CH = 0x8000;
+    for (var i = 0; i < bytes.length; i += CH) s += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+    return btoa(s);
+  }
+
+  function load(b64, scale, showTabs) {
+    el.innerHTML = '';
+    api = new alphaTab.AlphaTabApi(el, {
+      core: { fontDirectory: 'font/', useWorkers: false, engine: 'svg' },
+      display: { scale: scale, layoutMode: alphaTab.LayoutMode.Page, staveProfile: showTabs ? alphaTab.StaveProfile.Default : alphaTab.StaveProfile.Score },
+      player: { playerMode: alphaTab.PlayerMode.Disabled }
+    });
+    api.error.on(function (e) { Android.onError(String(e && e.message || e)); });
+    api.scoreLoaded.on(function (score) {
+      try {
+        // le fichier MIDI du morceau, pour que l'application joue l'orchestre
+        var midiFile = new alphaTab.midi.MidiFile();
+        midiFile.format = alphaTab.midi.MidiFileFormat.MultiTrack;
+        var handler = new alphaTab.midi.AlphaSynthMidiFileHandler(midiFile, true);
+        var gen = new alphaTab.midi.MidiFileGenerator(score, api.settings, handler);
+        gen.generate();
+        lookup = gen.tickLookup;
+        allTracks = new Set(score.tracks.map(function (t) { return t.index; }));
+        var tracks = score.tracks.map(function (t) {
+          return { index: t.index, name: t.name || '', channel: t.playbackInfo.primaryChannel,
+                   channel2: t.playbackInfo.secondaryChannel, percussion: !!t.isPercussion };
+        });
+        Android.onMidi(bytesToB64(midiFile.toBinary()), JSON.stringify(tracks), score.title || '');
+      } catch (e) { Android.onError('midi: ' + e); }
+    });
+    api.renderFinished.on(function () { Android.onRendered(); });
+    api.load(b64ToBytes(b64));
+  }
+
+  /** N'afficher que certaines pistes (par exemple la mélodie de Bermet). */
+  function showTracks(indices) {
+    if (!api || !api.score) return;
+    var t = indices.map(function (i) { return api.score.tracks[i]; }).filter(function (x) { return !!x; });
+    if (t.length) api.renderTracks(t);
+  }
+
+  /** Place le curseur sur le temps joué au tick MIDI donné. */
+  function cursorAt(tick) {
+    if (!api || !lookup || !api.boundsLookup) return;
+    var res = lookup.findBeat(allTracks, tick, null);
+    if (!res) return;
+    var visible = res;
+    var bb = null;
+    // le temps peut appartenir à une piste non affichée : on cherche un temps affiché au même moment
+    bb = api.boundsLookup.findBeat(visible.beat);
+    if (!bb) {
+      var mb = api.boundsLookup.findMasterBarByIndex ? api.boundsLookup.findMasterBarByIndex(res.masterBar.masterBar.index) : null;
+      if (!mb) return;
+      barEl.style.display = 'block';
+      barEl.style.left = mb.visualBounds.x + 'px'; barEl.style.top = mb.visualBounds.y + 'px';
+      barEl.style.width = mb.visualBounds.w + 'px'; barEl.style.height = mb.visualBounds.h + 'px';
+      cursor.style.display = 'none';
+      scrollTo(mb.visualBounds);
+      return;
+    }
+    var vb = bb.visualBounds, sys = bb.barBounds.masterBarBounds;
+    cursor.style.display = 'block';
+    cursor.style.left = (vb.x + vb.w / 2 - 3) + 'px';
+    cursor.style.top = sys.visualBounds.y + 'px';
+    cursor.style.height = sys.visualBounds.h + 'px';
+    var mbb = sys.visualBounds;
+    barEl.style.display = 'block';
+    barEl.style.left = mbb.x + 'px'; barEl.style.top = mbb.y + 'px';
+    barEl.style.width = mbb.w + 'px'; barEl.style.height = mbb.h + 'px';
+    if (lastBeat !== res.beat) { lastBeat = res.beat; scrollTo(sys.visualBounds); }
+  }
+
+  function scrollTo(b) {
+    var top = window.scrollY, h = window.innerHeight;
+    if (b.y < top + 20 || b.y + b.h > top + h - 40) window.scrollTo({ top: Math.max(0, b.y - h * 0.25), behavior: 'smooth' });
+  }
+
+  return { load: load, showTracks: showTracks, cursor: cursorAt };
+})();
+Android.onReady();
+</script>
+</body>
+</html>

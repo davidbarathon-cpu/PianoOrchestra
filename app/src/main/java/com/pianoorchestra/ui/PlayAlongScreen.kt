@@ -103,6 +103,7 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     // ouvrir un morceau : lecture du fichier en arrière-plan, puis « ma partie » choisie automatiquement
     LaunchedEffect(opened) {
         val e = opened ?: return@LaunchedEffect
+        if (e.isScore) return@LaunchedEffect           // la partition se charge dans son propre écran
         val current = app.player.state.value
         if (current.playing && current.song?.name == e.title(lang)) return@LaunchedEffect   // déjà en cours (écran tourné)
         loading = true
@@ -118,13 +119,19 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
         if (autoPlay) app.player.play()
     }
     LaunchedEffect(autoOpen) {
-        if (autoOpen in app.library.builtIn.indices && openedId == null) openedId = app.library.builtIn[autoOpen].id
+        if (openedId == null) {
+            if (autoOpen in app.library.builtIn.indices) openedId = app.library.builtIn[autoOpen].id
+            else if (autoOpen - 100 in app.library.builtInScores.indices) openedId = app.library.builtInScores[autoOpen - 100].id
+        }
     }
 
     val entry = opened
     if (entry == null) {
         SongList(app, lang, refresh, onBack, onImport = { importLauncher.launch(arrayOf("*/*")) },
             onOpen = { openedId = it.id }, onDeleted = { refresh++ })
+    } else if (entry.isScore) {
+        BackHandler { app.player.stop(); openedId = null }
+        ScoreView(app, lang, entry, onBack = { openedId = null })
     } else {
         BackHandler { app.player.stop(); openedId = null }
         val song = state.song
@@ -176,6 +183,8 @@ private fun SongList(
             }
             item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_builtin), Modifier.padding(top = 8.dp)) }
             items(app.library.builtIn, key = { it.id }) { e -> SongCard(e, lang, onClick = { onOpen(e) }) }
+            item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_scores), Modifier.padding(top = 8.dp)) }
+            items(app.library.builtInScores, key = { it.id }) { e -> SongCard(e, lang, onClick = { onOpen(e) }) }
             item(span = { GridItemSpan(maxLineSpan) }) { Spacer(Modifier.height(24.dp)) }
         }
     }

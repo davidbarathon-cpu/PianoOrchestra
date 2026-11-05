@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 /** Une partie du morceau : une piste MIDI sur un canal (batterie, basse, mélodie…). */
 class Part(
     val index: Int,
-    val name: String,
+    var name: String,
     val channel: Int,
     val program: Int,
     val noteCount: Int,
@@ -30,6 +30,18 @@ class Song(
     private val tpq: Int = 480,
     private val tickSeconds: (Long) -> Double = { it * 0.5 / 480 },
 ) {
+    /** Le tick MIDI à [seconds] (pour placer le curseur de la partition). */
+    fun tickAt(seconds: Double): Long {
+        var lo = 0L
+        var hi = 1L
+        while (tickSeconds(hi) < seconds && hi < (1L shl 40)) hi *= 2
+        while (lo < hi) {
+            val mid = (lo + hi) / 2
+            if (tickSeconds(mid) < seconds) lo = mid + 1 else hi = mid
+        }
+        return lo
+    }
+
     class Section(val name: String, val start: Double, val end: Double)
     class Chord(val time: Double, val name: String)
 

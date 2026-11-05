@@ -22,6 +22,8 @@ class SongLibrary(private val context: Context) {
         val file: File? = null,
     ) {
         val builtIn: Boolean get() = asset != null
+        /** Partition (Guitar Pro, MusicXML) plutôt que fichier MIDI. */
+        val isScore: Boolean get() = (asset ?: file?.name ?: "").substringAfterLast('.').lowercase() in SCORE_EXT
         fun title(lang: String) = if (lang == "ru") titleRu else titleFr
         fun style(lang: String) = if (lang == "ru") styleRu else styleFr
     }
@@ -37,15 +39,31 @@ class SongLibrary(private val context: Context) {
         Entry("06_cinematique", "Thème de film en la mineur", "Киномузыка в ля миноре", "Musique de film", "Киномузыка", asset = "songs/06_cinematique.mid"),
     )
 
+    /** Les mêmes morceaux, en partition (Guitar Pro écrit par Riffmaker) : mélodie, guitare, basse, batterie. */
+    val builtInScores = builtIn.map { e ->
+        Entry(e.id + "_gp", e.titleFr, e.titleRu, "Partition · " + e.styleFr, "Ноты · " + e.styleRu,
+            asset = e.asset!!.removeSuffix(".mid") + ".gp5")
+    }
+
     fun imported(): List<Entry> =
-        (dir.listFiles { f -> f.extension.lowercase() in setOf("mid", "midi", "kar") } ?: emptyArray())
+        (dir.listFiles { f -> f.extension.lowercase() in MIDI_EXT + SCORE_EXT } ?: emptyArray())
             .sortedByDescending { it.lastModified() }
             .map { f ->
                 val name = f.nameWithoutExtension.replace('_', ' ')
-                Entry("file:" + f.name, name, name, "MIDI", "MIDI", file = f)
+                val kind = if (f.extension.lowercase() in SCORE_EXT) {
+                    if (f.extension.lowercase().startsWith("gp")) "Guitar Pro" else "MusicXML"
+                } else "MIDI"
+                Entry("file:" + f.name, name, name, kind, kind, file = f)
             }
 
-    fun all(): List<Entry> = imported() + builtIn
+    fun all(): List<Entry> = imported() + builtIn + builtInScores
+
+    /** Le contenu brut d'un morceau (pour la partition). */
+    fun bytes(e: Entry): ByteArray = when {
+        e.asset != null -> context.assets.open(e.asset).use { it.readBytes() }
+        e.file != null -> e.file.readBytes()
+        else -> ByteArray(0)
+    }
 
     fun load(e: Entry, lang: String): Song {
         val bytes = when {
@@ -89,12 +107,17 @@ class SongLibrary(private val context: Context) {
     /** Copie un fichier MIDI choisi par l'utilisatrice dans la bibliothèque. Renvoie son titre, ou null. */
     fun import(uri: Uri): String? {
         val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
-        try { Song.parse(bytes, "") } catch (_: Exception) { return null }
-        var name = displayName(uri) ?: "morceau"
-        name = name.substringBeforeLast('.').replace(Regex("[\\\\/:*?\"<>|]"), "_").take(80).ifBlank { "morceau" }
-        var f = File(dir, "$name.mid")
+        val display = displayName(uri) ?: "morceau"
+        var ext = display.substringAfterLast('.', "").lowercase()
+        if (ext !in SCORE_EXT) {
+            // MIDI : on vérifie qu'il se lit
+            try { Song.parse(bytes, "") } catch (_: Exception) { return null }
+            ext = "mid"
+        }
+        var name = display.substringBeforeLast('.').replace(Regex("[\\\\/:*?\"<>|]"), "_").take(80).ifBlank { "morceau" }
+        var f = File(dir, "$name.$ext")
         var k = 2
-        while (f.exists()) { f = File(dir, "$name ($k).mid"); k++ }
+        while (f.exists()) { f = File(dir, "$name ($k).$ext"); k++ }
         f.writeBytes(bytes)
         return f.nameWithoutExtension
     }
@@ -106,4 +129,9 @@ class SongLibrary(private val context: Context) {
             if (c.moveToFirst()) c.getString(0) else null
         }
     } catch (_: Exception) { uri.lastPathSegment }
+
+    companion object {
+        val MIDI_EXT = setOf("mid", "midi", "kar")
+        val SCORE_EXT = setOf("gp", "gp3", "gp4", "gp5", "gpx", "xml", "musicxml", "mxl")
+    }
 }
