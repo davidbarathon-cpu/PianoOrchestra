@@ -36,6 +36,7 @@
                 <data android:mimeType="application/vnd.recordare.musicxml+xml" />
                 <data android:mimeType="application/vnd.recordare.musicxml" />
                 <data android:mimeType="application/x-guitar-pro" />
+                <data android:mimeType="application/pdf" />
             </intent-filter>
         </activity>
 

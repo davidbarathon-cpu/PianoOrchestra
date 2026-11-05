@@ -44,9 +44,12 @@ class LiveInput {
 
     val keys = MutableStateFlow<Set<Int>>(emptySet())
     val pedal = MutableStateFlow(false)
+    /** Tourne-page au pédalier : (compteur, sens) — +1 pédale du milieu, -1 pédale de gauche. */
+    val pageTurn = MutableStateFlow(0L to 0)
     val log = MutableStateFlow<List<Entry>>(emptyList())
     private var counter = 0L
     private val down = BooleanArray(128)
+    private val pedalDown = BooleanArray(2)
 
     @Synchronized
     fun onMidi(status: Int, d1: Int, d2: Int) {
@@ -56,6 +59,11 @@ class LiveInput {
             kind == 0x90 && d2 > 0 && ch != 9 -> { down[d1] = true; publishKeys() }
             (kind == 0x80 || (kind == 0x90 && d2 == 0)) && ch != 9 -> { down[d1] = false; publishKeys() }
             kind == 0xB0 && d1 == 64 -> pedal.value = d2 >= 64
+            kind == 0xB0 && (d1 == 66 || d1 == 67) && d2 >= 64 && !pedalDown[d1 - 66] -> {
+                pedalDown[d1 - 66] = true
+                pageTurn.value = (pageTurn.value.first + 1) to (if (d1 == 66) 1 else -1)
+            }
+            kind == 0xB0 && (d1 == 66 || d1 == 67) && d2 < 64 -> pedalDown[d1 - 66] = false
         }
         val interesting = (kind == 0x90) || (kind == 0x80) || (kind == 0xC0) || (kind == 0xB0 && d1 == 64)
         if (interesting) log.value = (listOf(Entry(status, d1, d2, counter++)) + log.value).take(40)

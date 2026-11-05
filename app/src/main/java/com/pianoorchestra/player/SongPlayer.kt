@@ -26,6 +26,7 @@ class SongPlayer : Sequencer {
         val loopEnd: Double = -1.0,
         val recording: Boolean = false,
         val loops: Int = 0,
+        val following: Boolean = false,
     ) {
         val looping: Boolean get() = loopEnd > loopStart && loopStart >= 0
     }
@@ -60,8 +61,9 @@ class SongPlayer : Sequencer {
     private var loopB = -1.0
     private var loops = 0
 
-    // attente
+    // attente et suivi du tempo
     private var waitMode = false
+    private var follow = false
     private var waitingFor: IntArray? = null
     private var checkedUntil = -1          // dernier événement de « ma partie » déjà vérifié
     private var clockFrames = 0L           // horloge réelle (échantillons), même pendant l'attente
@@ -112,6 +114,9 @@ class SongPlayer : Sequencer {
     fun setTempo(value: Double) = post { tempo = value.coerceIn(0.3, 1.5); publish(force = true) }
     fun setWaitMode(on: Boolean) = post { waitMode = on; waitingFor = null; checkedUntil = idx - 1; publish(force = true) }
 
+    /** « Suis-moi » : l'orchestre attend et accélère ou ralentit avec elle. */
+    fun setFollow(on: Boolean) = post { follow = on; if (on) waitMode = true; waitingFor = null; checkedUntil = idx - 1; publish(force = true) }
+
     /** Boucle de [a] à [b] secondes ; a < 0 pour l'enlever. */
     fun setLoop(a: Double, b: Double) = post { synth ->
         loopA = a; loopB = b; loops = 0
@@ -151,7 +156,10 @@ class SongPlayer : Sequencer {
         while (true) {
             val m = live.poll() ?: break
             val kind = m[0] and 0xF0
-            if (kind == 0x90 && m[2] > 0) playedAt[m[1]] = clockFrames
+            if (kind == 0x90 && m[2] > 0) {
+                playedAt[m[1]] = clockFrames
+                if (follow && playing && userPart >= 0) followNote(m[1])
+            }
             if (recording && playing && t >= recStart) recEvents.add(MidiWriter.Event(t - recStart, m[0], m[1], m[2]))
         }
         val s = song ?: return
@@ -174,7 +182,9 @@ class SongPlayer : Sequencer {
         val events = s.events
 
         if (waitMode && userPart >= 0) {
-            var k = maxOf(idx, checkedUntil + 1)
+            // en mode « suis-moi », on laisse un peu de marge avant de s'arrêter (un tiers de temps)
+            val grace = if (follow) s.beatSecondsAt(t) * 0.35 else 0.0
+            var k = checkedUntil + 1
             while (k < events.size && events[k].time < tEnd) {
                 val e = events[k]
                 if (e.part == userPart && (e.status and 0xF0) == 0x90 && e.d2 > 0 && e.time >= startAt) {
@@ -186,15 +196,18 @@ class SongPlayer : Sequencer {
                         if (g.part == userPart && (g.status and 0xF0) == 0x90 && g.d2 > 0) group.add(g.d1)
                         j++
                     }
-                    checkedUntil = j - 1
                     val played = group.all { clockFrames - playedAt[it] < sampleRate * 3L / 4 }
-                    if (!played) {
-                        tEnd = e.time
+                    if (played) {
+                        checkedUntil = j - 1
+                    } else if (tEnd > e.time + grace) {
+                        checkedUntil = j - 1
+                        tEnd = maxOf(t, e.time + grace)
                         waitingFor = group.toIntArray()
                         _guide.value = group.toSet()
                     }
                     break
                 }
+                checkedUntil = k
                 k++
             }
         }
@@ -224,6 +237,27 @@ class SongPlayer : Sequencer {
             t = 0.0
         }
         publish()
+    }
+
+    /** Compare la note jouée à la note attendue la plus proche, et ajuste doucement le tempo. */
+    private fun followNote(note: Int) {
+        val s = song ?: return
+        if (waitingFor != null || t < startAt) return
+        val beat = s.beatSecondsAt(t)
+        var k = s.indexAt(t - beat)
+        var best = Double.MAX_VALUE
+        while (k < s.events.size && s.events[k].time < t + beat) {
+            val e = s.events[k]
+            if (e.part == userPart && (e.status and 0xF0) == 0x90 && e.d2 > 0 && e.d1 == note) {
+                val err = t - e.time
+                if (kotlin.math.abs(err) < kotlin.math.abs(best)) best = err
+            }
+            k++
+        }
+        if (best == Double.MAX_VALUE) return
+        // en retard (err > 0) : on ralentit ; en avance : on accélère — par petites touches
+        val errBeats = (best / beat).coerceIn(-0.5, 0.5)
+        tempo = (tempo * (1.0 - 0.07 * errBeats)).coerceIn(0.4, 1.4)
     }
 
     private fun dispatch(synth: Synth, e: SongEvent) {
@@ -360,6 +394,6 @@ class SongPlayer : Sequencer {
         if (!force && kotlin.math.abs(t - lastPublished) < 0.1 && waiting == cur.waiting) return
         lastPublished = t
         _state.value = State(song, playing, t.coerceAtLeast(0.0), playing && t < startAt, waiting, tempo,
-            loopA, loopB, recording, loops)
+            loopA, loopB, recording, loops, follow)
     }
 }

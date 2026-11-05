@@ -103,7 +103,7 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     // ouvrir un morceau : lecture du fichier en arrière-plan, puis « ma partie » choisie automatiquement
     LaunchedEffect(opened) {
         val e = opened ?: return@LaunchedEffect
-        if (e.isScore) return@LaunchedEffect           // la partition se charge dans son propre écran
+        if (e.isScore || e.isPdf) return@LaunchedEffect           // la partition se charge dans son propre écran
         val current = app.player.state.value
         if (current.playing && current.song?.name == e.title(lang)) return@LaunchedEffect   // déjà en cours (écran tourné)
         loading = true
@@ -129,6 +129,9 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     if (entry == null) {
         SongList(app, lang, refresh, onBack, onImport = { importLauncher.launch(arrayOf("*/*")) },
             onOpen = { openedId = it.id }, onDeleted = { refresh++ })
+    } else if (entry.isPdf) {
+        BackHandler { openedId = null }
+        PdfView(app, lang, entry, onBack = { openedId = null })
     } else if (entry.isScore) {
         BackHandler { app.player.stop(); openedId = null }
         ScoreView(app, lang, entry, onBack = { openedId = null })
@@ -257,7 +260,7 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
             app.lastSaved.value = null
         }
     }
-    LaunchedEffect(Unit) { app.player.setWaitMode(false) }
+    LaunchedEffect(Unit) { app.player.setWaitMode(false); app.player.setFollow(false) }
 
     val section = song.sectionAt(state.position)
     val (chordNow, chordNext) = song.chordAt(state.position)
@@ -349,7 +352,8 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
                                 colors = SliderDefaults.colors(thumbColor = Po.Gold, activeTrackColor = Po.Gold, inactiveTrackColor = Po.Stroke)
                             )
                             SwitchRow(stringResource(R.string.countin), null, countIn) { countIn = it; app.player.countIn = it }
-                            SwitchRow(stringResource(R.string.wait_mode), stringResource(R.string.wait_mode_sub), waitMode) { waitMode = it; app.player.setWaitMode(it) }
+                            SwitchRow(stringResource(R.string.wait_mode), stringResource(R.string.wait_mode_sub), waitMode || state.following) { waitMode = it; app.player.setWaitMode(it); if (!it) app.player.setFollow(false) }
+                            SwitchRow(stringResource(R.string.follow), stringResource(R.string.follow_sub), state.following) { app.player.setFollow(it); if (it) waitMode = true }
                             SwitchRow(stringResource(R.string.progressive), stringResource(R.string.progressive_sub), progressive) { progressive = it; app.player.progressive = it }
                             Text(stringResource(R.string.loop), color = Po.Text, fontSize = 20.sp, modifier = Modifier.padding(top = 6.dp))
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {

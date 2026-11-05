@@ -158,6 +158,11 @@
 
     <string name="songs_scores">Ноты</string>
 
+    <string name="follow">Следуй за моим темпом</string>
+    <string name="follow_sub">Оркестр ждёт твои ноты и ускоряется или замедляется вместе с тобой.</string>
+    <string name="pdf_hint">Коснись справа, чтобы перевернуть страницу, слева — чтобы вернуться. С тройной педалью: средняя — следующая страница, левая — предыдущая.</string>
+    <string name="page_of">Страница %1$d / %2$d</string>
+
     <string-array name="note_names">
         <item>до</item>
         <item>до♯</item>

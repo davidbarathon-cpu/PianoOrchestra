@@ -23,6 +23,7 @@ class SongLibrary(private val context: Context) {
     ) {
         val builtIn: Boolean get() = asset != null
         /** Partition (Guitar Pro, MusicXML) plutôt que fichier MIDI. */
+        val isPdf: Boolean get() = (asset ?: file?.name ?: "").lowercase().endsWith(".pdf")
         val isScore: Boolean get() = (asset ?: file?.name ?: "").substringAfterLast('.').lowercase() in SCORE_EXT
         fun title(lang: String) = if (lang == "ru") titleRu else titleFr
         fun style(lang: String) = if (lang == "ru") styleRu else styleFr
@@ -46,11 +47,11 @@ class SongLibrary(private val context: Context) {
     }
 
     fun imported(): List<Entry> =
-        (dir.listFiles { f -> f.extension.lowercase() in MIDI_EXT + SCORE_EXT } ?: emptyArray())
+        (dir.listFiles { f -> f.extension.lowercase() in MIDI_EXT + SCORE_EXT + "pdf" } ?: emptyArray())
             .sortedByDescending { it.lastModified() }
             .map { f ->
                 val name = f.nameWithoutExtension.replace('_', ' ')
-                val kind = if (f.extension.lowercase() in SCORE_EXT) {
+                val kind = if (f.extension.lowercase() == "pdf") "PDF" else if (f.extension.lowercase() in SCORE_EXT) {
                     if (f.extension.lowercase().startsWith("gp")) "Guitar Pro" else "MusicXML"
                 } else "MIDI"
                 Entry("file:" + f.name, name, name, kind, kind, file = f)
@@ -109,7 +110,7 @@ class SongLibrary(private val context: Context) {
         val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return null
         val display = displayName(uri) ?: "morceau"
         var ext = display.substringAfterLast('.', "").lowercase()
-        if (ext !in SCORE_EXT) {
+        if (ext !in SCORE_EXT && ext != "pdf") {
             // MIDI : on vérifie qu'il se lit
             try { Song.parse(bytes, "") } catch (_: Exception) { return null }
             ext = "mid"

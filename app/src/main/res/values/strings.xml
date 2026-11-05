@@ -165,6 +165,11 @@
 
     <string name="songs_scores">Partitions</string>
 
+    <string name="follow">Suis mon tempo</string>
+    <string name="follow_sub">L’orchestre attend tes notes et accélère ou ralentit avec toi.</string>
+    <string name="pdf_hint">Touche à droite pour tourner la page, à gauche pour revenir. Avec le pédalier triple : pédale du milieu = page suivante, pédale de gauche = page précédente.</string>
+    <string name="page_of">Page %1$d / %2$d</string>
+
     <string-array name="note_names">
         <item>do</item>
         <item>do♯</item>
