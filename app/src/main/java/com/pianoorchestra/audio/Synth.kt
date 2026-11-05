@@ -278,7 +278,7 @@ class Synth(private val sf: SoundFont, val sampleRate: Int) {
     }
 
     companion object {
-        const val MAX_VOICES = 64
+        const val MAX_VOICES = 96
         /** 16 canaux MIDI + 1 canal privé pour la tablette (écho du piano, clavier à l'écran). */
         const val CHANNELS = 17
         const val PRIVATE_CHANNEL = 16
