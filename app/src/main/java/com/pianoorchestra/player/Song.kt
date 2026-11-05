@@ -47,6 +47,18 @@ class Song(
     }
 
     companion object {
+        /** Texte d'un fichier MIDI : UTF-8 si c'en est, sinon Latin-1 (Riffmaker, Guitar Pro, la plupart des logiciels). */
+        private fun text(data: ByteArray, start: Int, len: Int): String {
+            val dec = Charsets.UTF_8.newDecoder()
+                .onMalformedInput(java.nio.charset.CodingErrorAction.REPORT)
+                .onUnmappableCharacter(java.nio.charset.CodingErrorAction.REPORT)
+            return try {
+                dec.decode(ByteBuffer.wrap(data, start, len)).toString().trim()
+            } catch (_: java.nio.charset.CharacterCodingException) {
+                String(data, start, len, Charsets.ISO_8859_1).trim()
+            }
+        }
+
         /** Lit un fichier MIDI standard (format 0 ou 1). Lève une exception si ce n'en est pas un. */
         fun parse(data: ByteArray, name: String): Song {
             val b = ByteBuffer.wrap(data)
@@ -100,8 +112,7 @@ class Song(
                                 when (type) {
                                     0x51 -> if (l >= 3) tempoTicks.add(tick to (((data[ms].toInt() and 0xFF) shl 16) or
                                         ((data[ms + 1].toInt() and 0xFF) shl 8) or (data[ms + 2].toInt() and 0xFF)))
-                                    0x03 -> if (!trackNames.containsKey(track)) trackNames[track] =
-                                        String(data, ms, l, Charsets.UTF_8).trim()
+                                    0x03 -> if (!trackNames.containsKey(track)) trackNames[track] = text(data, ms, l)
                                     0x58 -> if (l >= 1 && tick == 0L) beatsPerBar = (data[ms].toInt() and 0xFF).coerceIn(1, 12)
                                     0x2F -> q = end
                                 }

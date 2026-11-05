@@ -64,6 +64,7 @@ class EngineTest {
             assertTrue(s.duration > 60)
             assertTrue(melodic.size >= 5)
             assertTrue(s.events.zipWithNext().all { (a, b) -> a.time <= b.time })
+            assertTrue("les accents des noms de pistes", s.parts.any { it.name.startsWith("Mélodie") })
         }
     }
 

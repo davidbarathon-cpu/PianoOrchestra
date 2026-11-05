@@ -102,6 +102,16 @@ jobs:
           name: captures
           path: shots/
 
+      - name: Publier les captures (branche « captures »)
+        if: always()
+        run: |
+          [ -d shots ] || exit 0
+          cd shots
+          git init -q -b captures
+          git add -A
+          git -c user.name="Piano Orchestra" -c user.email="ci@pianoorchestra" commit -qm "Captures de la version 0.1.${{ github.run_number }}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" captures
+
   release:
     name: Publier la mise à jour
     needs: [build, screenshots]
