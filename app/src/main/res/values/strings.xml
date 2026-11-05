@@ -210,4 +210,5 @@
     <string name="catalog_formats_xml">Partition animée (MusicXML) : elle défile pendant que tu joues.</string>
     <string name="catalog_license">Licence : %1$s</string>
     <string name="catalog_credits">Sources : Mutopia Project (domaine public et Creative Commons) et ASAP (CC BY-NC-SA 4.0). Merci aux bénévoles qui saisissent ces partitions.</string>
+    <string name="see_pdf">Partition PDF</string>
 </resources>

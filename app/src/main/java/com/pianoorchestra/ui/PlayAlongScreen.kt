@@ -149,7 +149,13 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
         if (loading || song == null || song.name != entry.title(lang)) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator(color = Po.Gold) }
         } else {
-            PlayerView(app, lang, song, onBack = { app.player.stop(); openedId = null })
+            // la partition PDF du même morceau (catalogue Mutopia), pour la lire pendant qu'on joue
+            val pdf = remember(entry.id) {
+                entry.file?.let { f -> java.io.File(f.parentFile, f.nameWithoutExtension + ".pdf").takeIf { it.exists() } }
+                    ?.let { f -> app.library.imported().firstOrNull { it.file == f } }
+            }
+            PlayerView(app, lang, song, onBack = { app.player.stop(); openedId = null },
+                onPdf = pdf?.let { p -> { app.player.stop(); openedId = p.id } })
         }
     }
 }
@@ -271,7 +277,7 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
+private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit, onPdf: (() -> Unit)? = null) {
     val state by app.player.state.collectAsState()
     val guide by app.player.guide.collectAsState()
     val keys by app.live.keys.collectAsState()
@@ -304,7 +310,12 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
     val (chordNow, chordNext) = song.chordAt(state.position)
 
     Column(Modifier.fillMaxSize()) {
-        TopBar(song.name, onBack)
+        TopBar(song.name, onBack) {
+            if (onPdf != null) {
+                GlassPill(stringResource(R.string.see_pdf), Icons.Rounded.Description, onClick = onPdf)
+                Spacer(Modifier.width(8.dp))
+            }
+        }
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 20.dp)) {
             val wide = maxWidth > 760.dp
             val controls: @Composable (Modifier) -> Unit = { m ->

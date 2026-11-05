@@ -203,4 +203,5 @@
     <string name="catalog_formats_xml">Интерактивные ноты (MusicXML): они прокручиваются, пока ты играешь.</string>
     <string name="catalog_license">Лицензия: %1$s</string>
     <string name="catalog_credits">Источники: Mutopia Project (общественное достояние и Creative Commons) и ASAP (CC BY-NC-SA 4.0). Спасибо волонтёрам, которые набирают эти ноты.</string>
+    <string name="see_pdf">Ноты PDF</string>
 </resources>
