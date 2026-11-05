@@ -184,4 +184,23 @@
     <string name="ambiance_nuit">Ночь</string>
     <string name="ambiance_aurore">Заря</string>
     <string name="ambiance_ocean">Океан</string>
+    <string name="catalog_title">Бесплатные ноты</string>
+    <string name="catalog_short">Каталог</string>
+    <string name="catalog_banner">Почти 800 пьес для фортепиано — от начального уровня до концертных</string>
+    <string name="catalog_search">Искать композитора, название…</string>
+    <string name="catalog_count">Пьес: %1$d</string>
+    <string name="level_all">Все</string>
+    <string name="level_1">Начальный</string>
+    <string name="level_2">Средний</string>
+    <string name="level_3">Продвинутый</string>
+    <string name="catalog_download">Скачать</string>
+    <string name="catalog_download_open">Скачать и открыть</string>
+    <string name="catalog_open">Открыть</string>
+    <string name="catalog_downloading">Загрузка…</string>
+    <string name="catalog_in_library">В моих пьесах</string>
+    <string name="catalog_failed">Не удалось скачать: проверь подключение к интернету.</string>
+    <string name="catalog_formats_midi_pdf">MIDI — чтобы играть с оркестром, и ноты в PDF — чтобы читать.</string>
+    <string name="catalog_formats_xml">Интерактивные ноты (MusicXML): они прокручиваются, пока ты играешь.</string>
+    <string name="catalog_license">Лицензия: %1$s</string>
+    <string name="catalog_credits">Источники: Mutopia Project (общественное достояние и Creative Commons) и ASAP (CC BY-NC-SA 4.0). Спасибо волонтёрам, которые набирают эти ноты.</string>
 </resources>

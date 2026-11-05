@@ -1,5 +1,7 @@
 package com.pianoorchestra.ui
 
+import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.material.icons.rounded.LibraryMusic
@@ -85,7 +87,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = -1, autoPlay: Boolean = false, openId: String? = null) {
+fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = -1, autoPlay: Boolean = false, openId: String? = null, onCatalog: () -> Unit = {}) {
     val state by app.player.state.collectAsState()
     // gardé quand l'écran tourne : l'identifiant du morceau ouvert
     var openedId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -133,7 +135,7 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
 
     val entry = opened
     if (entry == null) {
-        SongList(app, lang, refresh, onBack, onImport = { importLauncher.launch(arrayOf("*/*")) },
+        SongList(app, lang, refresh, onBack, onImport = { importLauncher.launch(arrayOf("*/*")) }, onCatalog = onCatalog,
             onOpen = { openedId = it.id }, onDeleted = { refresh++ })
     } else if (entry.isPdf) {
         BackHandler { openedId = null }
@@ -163,13 +165,15 @@ fun defaultUserPart(song: Song): Int {
 @Composable
 private fun SongList(
     app: App, lang: String, refresh: Int, onBack: () -> Unit,
-    onImport: () -> Unit, onOpen: (SongLibrary.Entry) -> Unit, onDeleted: () -> Unit,
+    onImport: () -> Unit, onOpen: (SongLibrary.Entry) -> Unit, onDeleted: () -> Unit, onCatalog: () -> Unit = {},
 ) {
     val mine = remember(refresh) { app.library.imported() }
     val context = LocalContext.current
     var toDelete by remember { mutableStateOf<SongLibrary.Entry?>(null) }
     Column(Modifier.fillMaxSize()) {
         TopBar(stringResource(R.string.songs_title), onBack) {
+            GlassPill(stringResource(R.string.catalog_short), Icons.Rounded.CloudDownload, onClick = onCatalog)
+            Spacer(Modifier.width(10.dp))
             GlassPill(stringResource(R.string.import_song), Icons.Rounded.Add, onClick = onImport)
             Spacer(Modifier.width(8.dp))
         }
@@ -179,6 +183,7 @@ private fun SongList(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            item(span = { GridItemSpan(maxLineSpan) }) { CatalogBanner(onCatalog) }
             if (mine.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_mine), Modifier.padding(top = 8.dp)) }
                 items(mine, key = { it.id }) { e ->
@@ -204,14 +209,27 @@ private fun SongList(
     }
 }
 
-private val COVERS = listOf(
-    Color(0xFFF3CC86) to Color(0xFFC98B36),
-    Color(0xFFB9A6FF) to Color(0xFF6E54FF),
-    Color(0xFF8FF0E3) to Color(0xFF2E9C8F),
-    Color(0xFFFFB3CF) to Color(0xFFD9578A),
-    Color(0xFF9CC3FF) to Color(0xFF3A6BD9),
-    Color(0xFFFFC59A) to Color(0xFFE0703A),
-)
+
+/** L'entrée du catalogue gratuit, en haut de la liste. */
+@Composable
+private fun CatalogBanner(onClick: () -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().glass(RoundedCornerShape(26.dp), strong = true).clickable(onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 18.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier.size(58.dp).clip(RoundedCornerShape(18.dp)).background(Po.accentBrush),
+            contentAlignment = Alignment.Center
+        ) { Icon(Icons.Rounded.CloudDownload, null, tint = Po.Night, modifier = Modifier.size(30.dp)) }
+        Spacer(Modifier.width(18.dp))
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.catalog_title), color = Po.Text, fontSize = 21.sp, fontWeight = FontWeight.Medium)
+            Text(stringResource(R.string.catalog_banner), color = Po.Muted, fontSize = 16.sp)
+        }
+        Icon(Icons.Rounded.ChevronRight, null, tint = Po.Gold, modifier = Modifier.size(30.dp))
+    }
+}
 
 @Composable
 private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, onDelete: (() -> Unit)? = null, onShare: (() -> Unit)? = null) {
@@ -224,7 +242,7 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
         verticalAlignment = Alignment.CenterVertically
     ) {
         // une petite « pochette » colorée, différente pour chaque morceau
-        val (c1, c2) = COVERS[(e.id.hashCode() and 0x7fffffff) % COVERS.size]
+        val (c1, c2) = Covers[(e.id.hashCode() and 0x7fffffff) % Covers.size]
         Box(
             Modifier.size(62.dp).clip(RoundedCornerShape(19.dp))
                 .background(Brush.linearGradient(listOf(c1, c2)))

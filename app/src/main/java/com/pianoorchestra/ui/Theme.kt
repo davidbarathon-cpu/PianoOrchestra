@@ -272,6 +272,16 @@ fun GlassPill(text: String, icon: ImageVector? = null, onClick: (() -> Unit)? = 
     }
 }
 
+/** Couleurs des « pochettes » des morceaux. */
+val Covers = listOf(
+    Color(0xFFF3CC86) to Color(0xFFC98B36),
+    Color(0xFFB9A6FF) to Color(0xFF6E54FF),
+    Color(0xFF8FF0E3) to Color(0xFF2E9C8F),
+    Color(0xFFFFB3CF) to Color(0xFFD9578A),
+    Color(0xFF9CC3FF) to Color(0xFF3A6BD9),
+    Color(0xFFFFC59A) to Color(0xFFE0703A),
+)
+
 /** do3 (C4) en français, до (C4) en russe. */
 fun noteLabel(note: Int, names: Array<String>, lang: String): String {
     val name = names[note % 12]
@@ -280,4 +290,4 @@ fun noteLabel(note: Int, names: Array<String>, lang: String): String {
 }
 
 /** Les écrans de l'application. */
-enum class Screen { HOME, KEYBOARD, PLAYALONG, FREEPLAY, SETTINGS }
+enum class Screen { HOME, KEYBOARD, PLAYALONG, FREEPLAY, SETTINGS, CATALOG }

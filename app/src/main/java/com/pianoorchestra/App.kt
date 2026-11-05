@@ -117,6 +117,7 @@ class App : Application() {
     lateinit var prefs: Prefs
     lateinit var midi: MidiInput
     lateinit var library: SongLibrary
+    lateinit var catalog: com.pianoorchestra.library.Catalog
     lateinit var updater: Updater
     lateinit var audio: AudioEngine
     val player = SongPlayer()
@@ -137,6 +138,7 @@ class App : Application() {
         prefs = Prefs(this)
         midi = MidiInput(this)
         library = SongLibrary(this)
+        catalog = com.pianoorchestra.library.Catalog(this, library)
         updater = Updater(this)
         audio = AudioEngine(this)
 

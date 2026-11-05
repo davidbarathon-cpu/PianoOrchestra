@@ -27,6 +27,7 @@ for lang in fr ru; do
   WAIT=10 shot "tablette-${lang}-4-groupe" --es po_lang $lang --ei po_song 0
   shot "tablette-${lang}-5-reglages" --es po_lang $lang --es po_screen settings
   WAIT=14 shot "tablette-${lang}-8-partition" --es po_lang $lang --ei po_song 100
+  WAIT=8 shot "tablette-${lang}-9-catalogue" --es po_lang $lang --es po_screen catalog
   WAIT=12 shot "tablette-${lang}-7-jeu-libre" --es po_lang $lang --es po_screen freeplay --es po_chord 45,48,52
 done
 

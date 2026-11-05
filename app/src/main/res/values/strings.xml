@@ -191,4 +191,23 @@
     <string name="ambiance_nuit">Nuit</string>
     <string name="ambiance_aurore">Aurore</string>
     <string name="ambiance_ocean">Océan</string>
+    <string name="catalog_title">Partitions gratuites</string>
+    <string name="catalog_short">Catalogue</string>
+    <string name="catalog_banner">Près de 800 morceaux de piano à télécharger, du débutant au concert</string>
+    <string name="catalog_search">Chercher un compositeur, un titre…</string>
+    <string name="catalog_count">%1$d morceaux</string>
+    <string name="level_all">Tous</string>
+    <string name="level_1">Débutant</string>
+    <string name="level_2">Intermédiaire</string>
+    <string name="level_3">Avancé</string>
+    <string name="catalog_download">Télécharger</string>
+    <string name="catalog_download_open">Télécharger et ouvrir</string>
+    <string name="catalog_open">Ouvrir</string>
+    <string name="catalog_downloading">Téléchargement…</string>
+    <string name="catalog_in_library">Dans mes morceaux</string>
+    <string name="catalog_failed">Téléchargement impossible : vérifie la connexion internet.</string>
+    <string name="catalog_formats_midi_pdf">MIDI pour jouer avec l’orchestre, et la partition en PDF pour la lire.</string>
+    <string name="catalog_formats_xml">Partition animée (MusicXML) : elle défile pendant que tu joues.</string>
+    <string name="catalog_license">Licence : %1$s</string>
+    <string name="catalog_credits">Sources : Mutopia Project (domaine public et Creative Commons) et ASAP (CC BY-NC-SA 4.0). Merci aux bénévoles qui saisissent ces partitions.</string>
 </resources>

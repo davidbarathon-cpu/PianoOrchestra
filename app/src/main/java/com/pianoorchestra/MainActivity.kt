@@ -23,6 +23,7 @@ import com.pianoorchestra.ui.HomeScreen
 import com.pianoorchestra.ui.KeyboardScreen
 import com.pianoorchestra.ui.PlayAlongScreen
 import com.pianoorchestra.ui.PoTheme
+import com.pianoorchestra.ui.CatalogScreen
 import com.pianoorchestra.ui.Po
 import com.pianoorchestra.ui.Ambiance
 import com.pianoorchestra.ui.Screen
@@ -72,15 +73,18 @@ class MainActivity : ComponentActivity() {
                 val lang = app.prefs.lang
                 var resumeId by rememberSaveable { mutableStateOf<String?>(null) }
                 Box(Modifier.fillMaxSize().systemBarsPadding()) {
-                    BackHandler(enabled = screen != Screen.HOME) { screen = Screen.HOME }
+                    BackHandler(enabled = screen != Screen.HOME) { screen = if (screen == Screen.CATALOG) Screen.PLAYALONG else Screen.HOME }
                     when (screen) {
                         Screen.HOME -> HomeScreen(app, lang, onLang = { l -> app.prefs.lang = l; recreate() },
                             onOpen = { resumeId = null; screen = it },
                             onResume = { id -> resumeId = id; screen = Screen.PLAYALONG })
                         Screen.KEYBOARD -> KeyboardScreen(app, lang) { screen = Screen.HOME }
-                        Screen.PLAYALONG -> PlayAlongScreen(app, lang, onBack = { screen = Screen.HOME }, autoOpen = autoSong, autoPlay = autoPlay, openId = resumeId)
+                        Screen.PLAYALONG -> PlayAlongScreen(app, lang, onBack = { screen = Screen.HOME }, autoOpen = autoSong, autoPlay = autoPlay, openId = resumeId,
+                            onCatalog = { resumeId = null; screen = Screen.CATALOG })
                         Screen.FREEPLAY -> FreePlayScreen(app, lang) { screen = Screen.HOME }
                         Screen.SETTINGS -> SettingsScreen(app) { screen = Screen.HOME }
+                        Screen.CATALOG -> CatalogScreen(app, lang, onBack = { screen = Screen.PLAYALONG },
+                            onOpen = { id -> resumeId = id; screen = Screen.PLAYALONG })
                     }
                 }
             }

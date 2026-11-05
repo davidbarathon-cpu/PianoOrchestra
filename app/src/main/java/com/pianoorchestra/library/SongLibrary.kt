@@ -30,6 +30,7 @@ class SongLibrary(private val context: Context) {
     }
 
     private val dir = File(context.filesDir, "songs").apply { mkdirs() }
+    val songsDir: File get() = dir
 
     val builtIn = listOf(
         Entry("01_ballade", "Ballade en do", "Баллада в до мажоре", "Ballade", "Баллада", asset = "songs/01_ballade.mid"),
