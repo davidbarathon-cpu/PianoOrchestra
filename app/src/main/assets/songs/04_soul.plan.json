@@ -1,0 +1,427 @@
+{
+  "style": "soul",
+  "tonalite": "Fa majeur",
+  "tempo": 84,
+  "graine": 1,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 4,
+      "accords": [
+        "Bbmaj7",
+        "C",
+        "Am7",
+        "Dm7"
+      ],
+      "groove": "soul_a",
+      "energie": 1,
+      "instruments": [
+        "cordes",
+        "cuivres"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "Gm7",
+        "C",
+        "Fmaj7",
+        "Dm7",
+        "Gm7",
+        "C",
+        "Fmaj7",
+        "Dm7"
+      ],
+      "groove": "soul_b",
+      "energie": 2,
+      "instruments": [
+        "basse",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "C/E",
+        "",
+        "",
+        "",
+        "C/E",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pré-refrain 1",
+      "type": "prerefrain",
+      "mesures": 4,
+      "accords": [
+        "Gm7",
+        "C",
+        "Gm7",
+        "C"
+      ],
+      "groove": "soul_b",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Bbmaj7",
+        "C",
+        "Am7",
+        "Dm7",
+        "Bbmaj7",
+        "C",
+        "Am7",
+        "Dm7"
+      ],
+      "groove": "motown",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "cuivres",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "Gm7",
+        "C",
+        "Fmaj7",
+        "Dm7",
+        "Gm7",
+        "C",
+        "Fmaj7",
+        "Dm7"
+      ],
+      "groove": "soul_b",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "C/E",
+        "",
+        "",
+        "",
+        "C/E",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pré-refrain 2",
+      "type": "prerefrain",
+      "mesures": 4,
+      "accords": [
+        "Gm7",
+        "C",
+        "Gm7",
+        "C"
+      ],
+      "groove": "soul_b",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "F"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Bbmaj7",
+        "C",
+        "Am7",
+        "Dm7",
+        "Bbmaj7",
+        "C",
+        "Am7",
+        "Dm7"
+      ],
+      "groove": "motown",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "cuivres",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pont",
+      "type": "pont",
+      "mesures": 8,
+      "accords": [
+        "Bbmaj7",
+        "Bbmaj7",
+        "Am7",
+        "Dm7",
+        "Bbmaj7",
+        "Bbmaj7",
+        "Am7",
+        "Dm7"
+      ],
+      "groove": "soul_b",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "orgue",
+        "cordes",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "G"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Cmaj7",
+        "D",
+        "Bm7",
+        "Em7",
+        "Cmaj7",
+        "D",
+        "Bm7",
+        "Em7"
+      ],
+      "groove": "motown",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "cuivres",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "G"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 4",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Cmaj7",
+        "D",
+        "Bm7",
+        "Em7",
+        "Cmaj7",
+        "D",
+        "Bm7",
+        "Em7"
+      ],
+      "groove": "motown",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "cuivres",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "G"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 4,
+      "accords": [
+        "Cmaj7",
+        "D",
+        "Bm7",
+        "G"
+      ],
+      "groove": "soul_a",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": false,
+  "graine_jeu": 0,
+  "palette": "riche",
+  "fin": "accord",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}

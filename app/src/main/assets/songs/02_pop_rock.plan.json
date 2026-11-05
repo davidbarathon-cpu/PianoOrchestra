@@ -1,0 +1,425 @@
+{
+  "style": "pop_rock",
+  "tonalite": "Sol majeur",
+  "tempo": 120,
+  "graine": 2,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 4,
+      "accords": [
+        "C",
+        "D",
+        "G",
+        "Em"
+      ],
+      "groove": "rock_intro",
+      "energie": 1,
+      "instruments": [
+        "piano",
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "D/F#",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "G",
+        "D",
+        "Em",
+        "C",
+        "G",
+        "D",
+        "Em",
+        "C"
+      ],
+      "groove": "pop_syncope",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "Bm/D",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pré-refrain 1",
+      "type": "prerefrain",
+      "mesures": 4,
+      "accords": [
+        "Em",
+        "C",
+        "Am",
+        "D"
+      ],
+      "groove": "pop_ghost",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "Bm/D",
+        "",
+        "",
+        "G"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "C",
+        "D",
+        "G",
+        "Em",
+        "C",
+        "D",
+        "G",
+        "Em"
+      ],
+      "groove": "pop_16",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "D/F#",
+        "",
+        "",
+        "",
+        "D/F#",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "G",
+        "D",
+        "Em",
+        "C",
+        "G",
+        "D",
+        "Em",
+        "C"
+      ],
+      "groove": "pop_syncope",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "Bm/D",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pré-refrain 2",
+      "type": "prerefrain",
+      "mesures": 4,
+      "accords": [
+        "Em",
+        "C",
+        "Am",
+        "D"
+      ],
+      "groove": "pop_ghost",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "Bm/D",
+        "",
+        "",
+        "G"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "C",
+        "D",
+        "G",
+        "Em",
+        "C",
+        "D",
+        "G",
+        "Em"
+      ],
+      "groove": "pop_16",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "D/F#",
+        "",
+        "",
+        "",
+        "D/F#",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pont",
+      "type": "pont",
+      "mesures": 8,
+      "accords": [
+        "Am",
+        "C",
+        "D",
+        "D",
+        "Am",
+        "C",
+        "D",
+        "D"
+      ],
+      "groove": "pop_demi_temps",
+      "energie": 1,
+      "instruments": [
+        "basse",
+        "piano",
+        "cordes",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "A"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "D",
+        "E",
+        "A",
+        "F#m",
+        "D",
+        "E",
+        "A",
+        "F#m"
+      ],
+      "groove": "pop_16",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "Em/G",
+        "",
+        "",
+        "",
+        "Em/G",
+        "A"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 4",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "D",
+        "E",
+        "A",
+        "F#m",
+        "D",
+        "E",
+        "A",
+        "F#m"
+      ],
+      "groove": "pop_16",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "Em/G",
+        "",
+        "",
+        "",
+        "Em/G",
+        "A"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 4,
+      "accords": [
+        "D",
+        "E",
+        "A",
+        "A"
+      ],
+      "groove": "rock_refrain_a",
+      "energie": 2,
+      "instruments": [
+        "piano",
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": false,
+  "graine_jeu": 0,
+  "palette": "simple",
+  "fin": "ralenti",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}

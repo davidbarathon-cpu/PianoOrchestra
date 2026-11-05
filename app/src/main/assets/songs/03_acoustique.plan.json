@@ -1,0 +1,300 @@
+{
+  "style": "acoustique",
+  "tonalite": "Ré majeur",
+  "tempo": 96,
+  "graine": 5,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 8,
+      "accords": [
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2",
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2"
+      ],
+      "groove": "ballade_vide",
+      "energie": 1,
+      "instruments": [
+        "piano",
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 16,
+      "accords": [
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A",
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A",
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A",
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A"
+      ],
+      "groove": "acou_cajon",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2",
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2"
+      ],
+      "groove": "acou_refrain_b",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A",
+        "Gadd9",
+        "Dadd9",
+        "Gadd9",
+        "A"
+      ],
+      "groove": "acou_train",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": true,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2",
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2"
+      ],
+      "groove": "acou_refrain_b",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2",
+        "Gsus2",
+        "A",
+        "Bm7",
+        "Dsus2"
+      ],
+      "groove": "acou_refrain_b",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 4,
+      "accords": [
+        "Gsus2",
+        "A",
+        "Bm7",
+        "D"
+      ],
+      "groove": "acou_couplet",
+      "energie": 2,
+      "instruments": [
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": false,
+  "graine_jeu": 0,
+  "palette": "pop_moderne",
+  "fin": "accord",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}

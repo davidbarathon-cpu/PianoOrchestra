@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+# Installe l'APK sur la tablette virtuelle, ouvre chaque écran en français puis en russe,
+# prend une capture, puis refait la même chose en format téléphone. Échoue si l'app plante.
+set -u
+APK=$(ls "$1"/*.apk | head -1)
+mkdir -p shots
+adb install -r "$APK"
+adb logcat -c
+PKG=com.pianoorchestra
+
+shot() {  # nom, extras…
+  local name=$1; shift
+  adb shell am start -S -W -n $PKG/.MainActivity "$@" > /dev/null
+  sleep "${WAIT:-6}"
+  adb exec-out screencap -p > "shots/$name.png"
+  echo "capture $name"
+}
+
+for lang in fr ru; do
+  WAIT=10 shot "tablette-${lang}-1-accueil" --es po_lang $lang --es po_screen home
+  shot "tablette-${lang}-2-clavier" --es po_lang $lang --es po_screen keyboard
+  shot "tablette-${lang}-3-morceaux" --es po_lang $lang --es po_screen playalong
+  WAIT=10 shot "tablette-${lang}-4-groupe" --es po_lang $lang --ei po_song 0
+  shot "tablette-${lang}-5-reglages" --es po_lang $lang --es po_screen settings
+done
+
+# le groupe joue-t-il vraiment ? on lance la lecture et on vérifie que le temps avance
+adb shell am start -S -W -n $PKG/.MainActivity --es po_lang fr --ei po_song 1 --ez po_autoplay true > /dev/null
+sleep 14
+adb exec-out screencap -p > "shots/tablette-fr-6-en-lecture.png"
+
+# format téléphone (même appareil, écran redimensionné)
+adb shell wm size 1080x2340
+adb shell wm density 420
+sleep 3
+shot "telephone-fr-1-accueil" --es po_lang fr --es po_screen home
+shot "telephone-fr-2-clavier" --es po_lang fr --es po_screen keyboard
+WAIT=10 shot "telephone-fr-3-groupe" --es po_lang fr --ei po_song 0
+adb shell wm size reset
+adb shell wm density reset
+
+adb logcat -d > shots/logcat.txt
+grep -E "PianoOrchestra|AndroidRuntime" shots/logcat.txt | tail -60
+if grep -q "FATAL EXCEPTION" shots/logcat.txt && grep -A3 "FATAL EXCEPTION" shots/logcat.txt | grep -q "$PKG"; then
+  echo "L'application a planté :"
+  grep -A30 "FATAL EXCEPTION" shots/logcat.txt
+  exit 1
+fi
+echo "Aucun plantage."

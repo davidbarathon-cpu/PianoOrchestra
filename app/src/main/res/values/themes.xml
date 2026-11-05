@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.PianoOrchestra" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/po_background</item>
+        <item name="android:statusBarColor">@color/po_background</item>
+        <item name="android:navigationBarColor">@color/po_background</item>
+    </style>
+    <color name="po_background">#FF0E1020</color>
+    <color name="po_icon_background">#FF151832</color>
+</resources>

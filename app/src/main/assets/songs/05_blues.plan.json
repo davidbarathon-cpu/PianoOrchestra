@@ -1,0 +1,343 @@
+{
+  "style": "blues",
+  "tonalite": "La majeur",
+  "tempo": 100,
+  "graine": 4,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 4,
+      "accords": [
+        "A7",
+        "D7",
+        "A7",
+        "A7"
+      ],
+      "groove": "blues_ride",
+      "energie": 1,
+      "instruments": [
+        "guitare"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 12,
+      "accords": [
+        "A7",
+        "A7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7",
+        "E7",
+        "D7",
+        "A7",
+        "E7"
+      ],
+      "groove": "blues_shuffle",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "D7",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "A7",
+        "D7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7"
+      ],
+      "groove": "blues_lourd",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "orgue",
+        "cuivres",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 12,
+      "accords": [
+        "A7",
+        "A7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7",
+        "E7",
+        "D7",
+        "A7",
+        "E7"
+      ],
+      "groove": "blues_shuffle",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie",
+        "reponses"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "D7",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "A7",
+        "D7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7"
+      ],
+      "groove": "blues_lourd",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "orgue",
+        "cuivres",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Solo",
+      "type": "solo",
+      "mesures": 12,
+      "accords": [
+        "A7",
+        "A7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7",
+        "E7",
+        "D7",
+        "A7",
+        "E7"
+      ],
+      "groove": "blues_lourd",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "orgue",
+        "guitare",
+        "guitare_solo"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "D7",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "A7",
+        "D7",
+        "A7",
+        "A7",
+        "D7",
+        "D7",
+        "A7",
+        "A7"
+      ],
+      "groove": "blues_lourd",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "orgue",
+        "cordes",
+        "cuivres",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 4,
+      "accords": [
+        "A7",
+        "D7",
+        "A7",
+        "A"
+      ],
+      "groove": "blues_shuffle",
+      "energie": 2,
+      "instruments": [
+        "cordes"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": true,
+  "graine_jeu": 0,
+  "palette": "simple",
+  "fin": "coup",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}

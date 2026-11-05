@@ -1,0 +1,344 @@
+{
+  "style": "cinematique",
+  "tonalite": "La mineur",
+  "tempo": 110,
+  "graine": 7,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 8,
+      "accords": [
+        "F",
+        "C",
+        "G",
+        "Am",
+        "F",
+        "C",
+        "G",
+        "Am"
+      ],
+      "groove": "cine_vide",
+      "energie": 1,
+      "instruments": [
+        "cordes",
+        "cuivres"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Asus4"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "Am",
+        "Am",
+        "Fsus4",
+        "Fsus4",
+        "Am",
+        "Am",
+        "Fsus4",
+        "E"
+      ],
+      "groove": "cine_pulse",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "synthe",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "C"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "F",
+        "C",
+        "G",
+        "Am",
+        "F",
+        "C",
+        "G",
+        "Am"
+      ],
+      "groove": "cine_epique",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "orgue",
+        "cordes",
+        "cuivres",
+        "synthe",
+        "choeurs",
+        "timbales",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "Am",
+        "Am",
+        "Fsus4",
+        "Fsus4",
+        "Am",
+        "Am",
+        "Fsus4",
+        "E"
+      ],
+      "groove": "cine_toms",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "synthe",
+        "melodie"
+      ],
+      "coupure": true,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "C"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "F",
+        "C",
+        "G",
+        "Am",
+        "F",
+        "C",
+        "G",
+        "Am"
+      ],
+      "groove": "cine_epique",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "orgue",
+        "cordes",
+        "cuivres",
+        "synthe",
+        "choeurs",
+        "timbales",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pont",
+      "type": "pont",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "Dm",
+        "Esus4",
+        "Esus4",
+        "Dm",
+        "Dm",
+        "Esus4",
+        "Esus4"
+      ],
+      "groove": "cine_marche",
+      "energie": 2,
+      "instruments": [
+        "basse",
+        "piano",
+        "orgue",
+        "cordes",
+        "choeurs",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "D"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "G",
+        "D",
+        "A",
+        "Bm",
+        "G",
+        "D",
+        "A",
+        "Bm"
+      ],
+      "groove": "cine_epique",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "orgue",
+        "cordes",
+        "cuivres",
+        "synthe",
+        "choeurs",
+        "timbales",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "D"
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 8,
+      "accords": [
+        "G",
+        "D",
+        "A",
+        "Bm",
+        "G",
+        "D",
+        "A",
+        "Bm"
+      ],
+      "groove": "cine_vide",
+      "energie": 2,
+      "instruments": [
+        "orgue"
+      ],
+      "coupure": false,
+      "transposition": 2,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": false,
+  "graine_jeu": 0,
+  "palette": "suspendue",
+  "fin": "coup",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}

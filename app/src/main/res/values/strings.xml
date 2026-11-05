@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Piano Orchestra</string>
+
+    <!-- Accueil -->
+    <string name="home_greeting">Bonjour Bermet</string>
+    <string name="home_subtitle">Ton piano, ton orchestre.</string>
+    <string name="lang_fr" translatable="false">Français</string>
+    <string name="lang_ru" translatable="false">Русский</string>
+    <string name="piano_connected">Piano connecté : %1$s</string>
+    <string name="piano_disconnected">Piano non connecté</string>
+    <string name="piano_hint">Branche le câble USB entre le piano et la tablette, puis allume le piano.</string>
+    <string name="sounds_loading">Préparation des sons…</string>
+    <string name="sounds_error">Les sons n’ont pas pu être chargés.</string>
+    <string name="menu_playalong">Jouer avec un groupe</string>
+    <string name="menu_playalong_sub">Tu joues, la tablette joue l’orchestre</string>
+    <string name="menu_keyboard">Clavier et test</string>
+    <string name="menu_keyboard_sub">Voir et entendre les notes jouées</string>
+    <string name="menu_settings">Réglages</string>
+    <string name="menu_settings_sub">Son, sortie audio, mises à jour</string>
+    <string name="back">Retour</string>
+
+    <!-- Clavier et test -->
+    <string name="monitor_title">Notes reçues</string>
+    <string name="monitor_empty">Joue une note sur le piano…</string>
+    <string name="monitor_note">%1$s · force %2$d · canal %3$d</string>
+    <string name="monitor_note_off">%1$s relâchée</string>
+    <string name="monitor_pedal_down">Pédale enfoncée</string>
+    <string name="monitor_pedal_up">Pédale relâchée</string>
+    <string name="monitor_program">Changement de son : %1$d</string>
+    <string name="echo_label">Faire sonner la tablette</string>
+    <string name="echo_sub">La tablette joue aussi les notes du piano, avec le son choisi.</string>
+    <string name="instrument_label">Son de la tablette</string>
+    <string name="demo_hint">Tu peux aussi toucher le clavier à l’écran.</string>
+
+    <!-- Instruments proposés pour l’écho -->
+    <string name="instr_piano">Piano</string>
+    <string name="instr_epiano">Piano électrique</string>
+    <string name="instr_organ">Orgue</string>
+    <string name="instr_strings">Cordes</string>
+    <string name="instr_choir">Chœur</string>
+    <string name="instr_flute">Flûte</string>
+    <string name="instr_guitar">Guitare</string>
+    <string name="instr_pad">Nappe de synthé</string>
+    <string name="instr_vibes">Vibraphone</string>
+    <string name="instr_harp">Harpe</string>
+
+    <!-- Familles d’instruments du mixeur -->
+    <string name="fam_drums">Batterie</string>
+    <string name="fam_piano">Piano</string>
+    <string name="fam_chromatic">Percussions mélodiques</string>
+    <string name="fam_organ">Orgue</string>
+    <string name="fam_guitar">Guitare</string>
+    <string name="fam_bass">Basse</string>
+    <string name="fam_strings">Cordes</string>
+    <string name="fam_ensemble">Ensemble</string>
+    <string name="fam_choir">Chœurs</string>
+    <string name="fam_brass">Cuivres</string>
+    <string name="fam_reed">Saxophones et bois</string>
+    <string name="fam_pipe">Flûte</string>
+    <string name="fam_synth">Synthé</string>
+    <string name="fam_other">Autre</string>
+    <string name="role_melody">Mélodie</string>
+    <string name="role_theme">Thème</string>
+    <string name="role_counter">Contrechant</string>
+    <string name="role_answers">Réponses</string>
+    <string name="role_solo">Solo</string>
+
+    <!-- Jouer avec un groupe -->
+    <string name="songs_title">Choisis un morceau</string>
+    <string name="songs_mine">Mes morceaux</string>
+    <string name="songs_builtin">Morceaux fournis</string>
+    <string name="import_song">Importer un fichier MIDI</string>
+    <string name="import_failed">Ce fichier n’a pas pu être lu.</string>
+    <string name="import_done">Morceau ajouté : %1$s</string>
+    <string name="delete_song">Supprimer</string>
+    <string name="delete_confirm">Supprimer « %1$s » ?</string>
+    <string name="cancel">Annuler</string>
+    <string name="yes">Oui</string>
+    <string name="song_info">%1$d BPM · %2$s</string>
+    <string name="my_part">Ma partie</string>
+    <string name="my_part_hint">Ta partie est coupée : c’est toi qui la joues. Ses notes s’affichent en doré sur le clavier.</string>
+    <string name="my_part_none">Aucune (écouter)</string>
+    <string name="play">Jouer</string>
+    <string name="stop">Arrêter</string>
+    <string name="restart">Recommencer</string>
+    <string name="tempo">Tempo</string>
+    <string name="tempo_value">%1$d %%</string>
+    <string name="countin">Décompte avant de commencer</string>
+    <string name="mixer">Mixeur</string>
+    <string name="mute">Couper</string>
+    <string name="solo">Solo</string>
+    <string name="you_play">Toi</string>
+
+    <!-- Réglages -->
+    <string name="settings_sound">Son</string>
+    <string name="master_volume">Volume général</string>
+    <string name="audio_output">Sortie audio</string>
+    <string name="audio_output_auto">Automatique</string>
+    <string name="audio_output_hint">Pour entendre l’orchestre par les haut-parleurs du piano : relie la prise casque de la tablette à l’entrée « Line In » du piano avec un câble jack, ou connecte le piano en Bluetooth audio.</string>
+    <string name="out_speaker">Haut-parleurs de la tablette</string>
+    <string name="out_wired">Prise casque / Line In</string>
+    <string name="out_usb">Audio USB</string>
+    <string name="out_bluetooth">Bluetooth</string>
+    <string name="out_other">Autre sortie</string>
+    <string name="updates_title">Mises à jour</string>
+    <string name="version_label">Version %1$s</string>
+    <string name="update_check">Vérifier</string>
+    <string name="update_checking">Vérification…</string>
+    <string name="update_available">Nouvelle version %1$s disponible</string>
+    <string name="update_install">Installer</string>
+    <string name="update_none">L’application est à jour.</string>
+    <string name="update_error">Pas de connexion internet pour vérifier.</string>
+    <string name="update_downloading">Téléchargement… %1$d %%</string>
+    <string name="update_allow">Autorise l’installation pour Piano Orchestra, puis reviens et appuie à nouveau sur Installer.</string>
+    <string name="credits">Sons : GeneralUser GS, par S. Christian Collins (licence libre). Morceaux fournis : composés avec Riffmaker.</string>
+
+    <!-- Noms des notes : do ré mi… -->
+    <string-array name="note_names">
+        <item>do</item>
+        <item>do♯</item>
+        <item>ré</item>
+        <item>mi♭</item>
+        <item>mi</item>
+        <item>fa</item>
+        <item>fa♯</item>
+        <item>sol</item>
+        <item>sol♯</item>
+        <item>la</item>
+        <item>si♭</item>
+        <item>si</item>
+    </string-array>
+</resources>

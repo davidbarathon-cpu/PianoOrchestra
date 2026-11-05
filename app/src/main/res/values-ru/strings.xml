@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Главный экран -->
+    <string name="home_greeting">Привет, Бермет</string>
+    <string name="home_subtitle">Твоё пианино — твой оркестр.</string>
+    <string name="piano_connected">Пианино подключено: %1$s</string>
+    <string name="piano_disconnected">Пианино не подключено</string>
+    <string name="piano_hint">Соедини пианино и планшет USB-кабелем, затем включи пианино.</string>
+    <string name="sounds_loading">Подготовка звуков…</string>
+    <string name="sounds_error">Не удалось загрузить звуки.</string>
+    <string name="menu_playalong">Играть с группой</string>
+    <string name="menu_playalong_sub">Ты играешь, планшет играет оркестр</string>
+    <string name="menu_keyboard">Клавиатура и проверка</string>
+    <string name="menu_keyboard_sub">Видеть и слышать сыгранные ноты</string>
+    <string name="menu_settings">Настройки</string>
+    <string name="menu_settings_sub">Звук, аудиовыход, обновления</string>
+    <string name="back">Назад</string>
+
+    <!-- Клавиатура и проверка -->
+    <string name="monitor_title">Полученные ноты</string>
+    <string name="monitor_empty">Сыграй ноту на пианино…</string>
+    <string name="monitor_note">%1$s · сила %2$d · канал %3$d</string>
+    <string name="monitor_note_off">%1$s отпущена</string>
+    <string name="monitor_pedal_down">Педаль нажата</string>
+    <string name="monitor_pedal_up">Педаль отпущена</string>
+    <string name="monitor_program">Смена звука: %1$d</string>
+    <string name="echo_label">Звук на планшете</string>
+    <string name="echo_sub">Планшет тоже играет ноты пианино выбранным звуком.</string>
+    <string name="instrument_label">Звук планшета</string>
+    <string name="demo_hint">Можно также нажимать клавиши на экране.</string>
+
+    <string name="instr_piano">Фортепиано</string>
+    <string name="instr_epiano">Электропиано</string>
+    <string name="instr_organ">Орган</string>
+    <string name="instr_strings">Струнные</string>
+    <string name="instr_choir">Хор</string>
+    <string name="instr_flute">Флейта</string>
+    <string name="instr_guitar">Гитара</string>
+    <string name="instr_pad">Синтезаторный фон</string>
+    <string name="instr_vibes">Вибрафон</string>
+    <string name="instr_harp">Арфа</string>
+
+    <string name="fam_drums">Ударные</string>
+    <string name="fam_piano">Фортепиано</string>
+    <string name="fam_chromatic">Мелодические ударные</string>
+    <string name="fam_organ">Орган</string>
+    <string name="fam_guitar">Гитара</string>
+    <string name="fam_bass">Бас</string>
+    <string name="fam_strings">Струнные</string>
+    <string name="fam_ensemble">Ансамбль</string>
+    <string name="fam_choir">Хор</string>
+    <string name="fam_brass">Медные духовые</string>
+    <string name="fam_reed">Саксофоны и деревянные</string>
+    <string name="fam_pipe">Флейта</string>
+    <string name="fam_synth">Синтезатор</string>
+    <string name="fam_other">Другое</string>
+    <string name="role_melody">Мелодия</string>
+    <string name="role_theme">Тема</string>
+    <string name="role_counter">Контрапункт</string>
+    <string name="role_answers">Ответы</string>
+    <string name="role_solo">Соло</string>
+
+    <!-- Играть с группой -->
+    <string name="songs_title">Выбери песню</string>
+    <string name="songs_mine">Мои песни</string>
+    <string name="songs_builtin">Встроенные песни</string>
+    <string name="import_song">Импортировать MIDI-файл</string>
+    <string name="import_failed">Не удалось прочитать этот файл.</string>
+    <string name="import_done">Песня добавлена: %1$s</string>
+    <string name="delete_song">Удалить</string>
+    <string name="delete_confirm">Удалить «%1$s»?</string>
+    <string name="cancel">Отмена</string>
+    <string name="yes">Да</string>
+    <string name="song_info">%1$d уд/мин · %2$s</string>
+    <string name="my_part">Моя партия</string>
+    <string name="my_part_hint">Твоя партия выключена: её играешь ты. Её ноты подсвечиваются золотым на клавиатуре.</string>
+    <string name="my_part_none">Нет (слушать)</string>
+    <string name="play">Играть</string>
+    <string name="stop">Стоп</string>
+    <string name="restart">Сначала</string>
+    <string name="tempo">Темп</string>
+    <string name="tempo_value">%1$d %%</string>
+    <string name="countin">Отсчёт перед началом</string>
+    <string name="mixer">Микшер</string>
+    <string name="mute">Выкл.</string>
+    <string name="solo">Соло</string>
+    <string name="you_play">Ты</string>
+
+    <!-- Настройки -->
+    <string name="settings_sound">Звук</string>
+    <string name="master_volume">Общая громкость</string>
+    <string name="audio_output">Аудиовыход</string>
+    <string name="audio_output_auto">Автоматически</string>
+    <string name="audio_output_hint">Чтобы оркестр звучал через динамики пианино, соедини разъём наушников планшета со входом «Line In» пианино кабелем с джеком или подключи пианино по Bluetooth-аудио.</string>
+    <string name="out_speaker">Динамики планшета</string>
+    <string name="out_wired">Разъём наушников / Line In</string>
+    <string name="out_usb">USB-аудио</string>
+    <string name="out_bluetooth">Bluetooth</string>
+    <string name="out_other">Другой выход</string>
+    <string name="updates_title">Обновления</string>
+    <string name="version_label">Версия %1$s</string>
+    <string name="update_check">Проверить</string>
+    <string name="update_checking">Проверка…</string>
+    <string name="update_available">Доступна новая версия %1$s</string>
+    <string name="update_install">Установить</string>
+    <string name="update_none">Установлена последняя версия.</string>
+    <string name="update_error">Нет интернета для проверки.</string>
+    <string name="update_downloading">Загрузка… %1$d %%</string>
+    <string name="update_allow">Разреши установку для Piano Orchestra, затем вернись и снова нажми «Установить».</string>
+    <string name="credits">Звуки: GeneralUser GS, автор S. Christian Collins (свободная лицензия). Встроенные песни созданы в Riffmaker.</string>
+
+    <string-array name="note_names">
+        <item>до</item>
+        <item>до♯</item>
+        <item>ре</item>
+        <item>ми♭</item>
+        <item>ми</item>
+        <item>фа</item>
+        <item>фа♯</item>
+        <item>соль</item>
+        <item>соль♯</item>
+        <item>ля</item>
+        <item>си♭</item>
+        <item>си</item>
+    </string-array>
+</resources>

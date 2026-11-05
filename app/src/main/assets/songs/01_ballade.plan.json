@@ -1,0 +1,362 @@
+{
+  "style": "ballade",
+  "tonalite": "Do majeur",
+  "tempo": 72,
+  "graine": 3,
+  "sections": [
+    {
+      "nom": "Intro",
+      "type": "intro",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "G"
+      ],
+      "groove": "ballade_vide",
+      "energie": 1,
+      "instruments": [
+        "guitare",
+        "theme"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "A7",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 1",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "C",
+        "F",
+        "Am",
+        "G",
+        "C",
+        "F",
+        "Am",
+        "G"
+      ],
+      "groove": "ballade_couplet",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 1",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "G"
+      ],
+      "groove": "ballade_demi",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "A7",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Couplet 2",
+      "type": "couplet",
+      "mesures": 8,
+      "accords": [
+        "C",
+        "F",
+        "Am",
+        "G",
+        "C",
+        "F",
+        "Am",
+        "G"
+      ],
+      "groove": "ballade_couplet",
+      "energie": 2,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 2",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "G"
+      ],
+      "groove": "ballade_demi",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Pont",
+      "type": "pont",
+      "mesures": 4,
+      "accords": [
+        "F",
+        "G",
+        "Em",
+        "Am"
+      ],
+      "groove": "ballade_couplet",
+      "energie": 1,
+      "instruments": [
+        "basse",
+        "piano",
+        "cordes",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 3",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "G"
+      ],
+      "groove": "ballade_demi",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "A7",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Refrain 4",
+      "type": "refrain",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "G"
+      ],
+      "groove": "ballade_demi",
+      "energie": 3,
+      "instruments": [
+        "batterie",
+        "basse",
+        "piano",
+        "cordes",
+        "guitare",
+        "melodie"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "A7",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    },
+    {
+      "nom": "Outro",
+      "type": "outro",
+      "mesures": 8,
+      "accords": [
+        "Dm",
+        "F",
+        "C",
+        "G",
+        "Dm",
+        "F",
+        "C",
+        "C"
+      ],
+      "groove": "ballade_vide",
+      "energie": 2,
+      "instruments": [
+        "guitare"
+      ],
+      "coupure": false,
+      "transposition": 0,
+      "accords_bis": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "intensite": 0.0,
+      "pedale": ""
+    }
+  ],
+  "signature": "4/4",
+  "decompte": false,
+  "accordage": 0,
+  "son_melodie": "flute",
+  "graine_melodie": 0,
+  "graine_solo": 0,
+  "octave_melodie": 0,
+  "titre": "",
+  "piste_importee": null,
+  "humain": 1,
+  "shuffle": false,
+  "graine_jeu": 0,
+  "palette": "simple",
+  "fin": "ralenti",
+  "paroles": null,
+  "arrangeur": "auto",
+  "trajectoire": "",
+  "feel": 0,
+  "chantable": false,
+  "tensions": "auto",
+  "ostinato": "auto",
+  "contrechant": "auto",
+  "verrous": {}
+}
