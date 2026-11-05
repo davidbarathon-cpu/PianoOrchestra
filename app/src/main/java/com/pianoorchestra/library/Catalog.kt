@@ -112,7 +112,7 @@ class Catalog(private val context: Context, private val library: SongLibrary) {
 
     companion object {
         const val REMOTE = "https://raw.githubusercontent.com/davidbarathon-cpu/PianoOrchestra/main/catalog/catalog.json"
-        const val BUNDLED_VERSION = 1
+        const val BUNDLED_VERSION = 2
 
         fun version(json: String): Int = Regex("\"version\"\\s*:\\s*(\\d+)").find(json)?.groupValues?.get(1)?.toInt() ?: 0
 

@@ -14,9 +14,10 @@ PKG=com.pianoorchestra
 
 shot() {  # nom, extras…
   local name=$1; shift
-  adb shell am start -S -W -n $PKG/.MainActivity "$@" > /dev/null
+  timeout 60 adb wait-for-device || { echo "émulateur perdu"; return; }
+  timeout 60 adb shell am start -S -W -n $PKG/.MainActivity "$@" > /dev/null
   sleep "${WAIT:-6}"
-  adb exec-out screencap -p > "shots/$name.png"
+  timeout 30 adb exec-out screencap -p > "shots/$name.png"
   echo "capture $name"
 }
 
@@ -55,7 +56,7 @@ WAIT=10 shot "telephone-fr-3-groupe" --es po_lang fr --ei po_song 0
 adb shell wm size reset
 adb shell wm density reset
 
-adb logcat -d > shots/logcat.txt
+timeout 60 adb logcat -d > shots/logcat.txt
 grep -E "PianoOrchestra|AndroidRuntime" shots/logcat.txt | tail -60
 if grep -q "FATAL EXCEPTION" shots/logcat.txt && grep -A3 "FATAL EXCEPTION" shots/logcat.txt | grep -q "$PKG"; then
   echo "L'application a planté :"

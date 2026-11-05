@@ -71,6 +71,7 @@ jobs:
     name: Essai sur tablette virtuelle et captures
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
 

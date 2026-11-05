@@ -64,8 +64,18 @@ for line in open('asap_tree.txt'):
         else: title=f"{g} n° {n}" if n[:1].isdigit() else f"{g} – {n}"
     cfr,cru=C.get(comp,(comp,comp))
     items.append(dict(id='as_'+hashlib.md5(d.encode()).hexdigest()[:10],t=title,o='',cf=cfr,cr=cru,s='concert',l=3,src='asap',xml=AS+d+'/xml_score.musicxml',lic='CC BY-NC-SA 4.0 (ASAP)'))
-items.sort(key=lambda i:(i['l'],i['cf'],i['t']))
-cat={'version':1,'sources':{'mutopia':'Mutopia Project – mutopiaproject.org (domaine public / Creative Commons)','asap':'ASAP dataset – github.com/fosfrancesco/asap-dataset (CC BY-NC-SA 4.0)'},'items':items}
+# ordre d'affichage : les compositeurs les plus connus d'abord, puis le niveau, puis les titres (numéros dans l'ordre)
+FAME=['E. Satie','J.-S. Bach','F. Chopin','L. van Beethoven','W. A. Mozart','P. I. Tchaïkovski','R. Schumann','F. Burgmüller','C. Debussy',
+ 'F. Schubert','S. Joplin','E. Grieg','F. Liszt','S. Rachmaninov','J. Haydn','G. F. Haendel','F. Mendelssohn','J. Brahms','M. Ravel',
+ 'Traditionnel','M. Moussorgski','N. Rimski-Korsakov','A. Scriabine','M. Glinka','M. Balakirev','S. Prokofiev','D. Scarlatti','J.-P. Rameau',
+ 'M. Clementi','F. Kuhlau','J. Pachelbel']
+def natkey(t): return [int(x) if x.isdigit() else x.lower() for x in re.split(r'(\d+)',t)]
+def rank(i):
+    c=i['cf']; f=FAME.index(c) if c in FAME else len(FAME)
+    if c=='C. Czerny': f=len(FAME)+1
+    return (f, c, i['l'], natkey(i['t']))
+items.sort(key=rank)
+cat={'version':2,'sources':{'mutopia':'Mutopia Project – mutopiaproject.org (domaine public / Creative Commons)','asap':'ASAP dataset – github.com/fosfrancesco/asap-dataset (CC BY-NC-SA 4.0)'},'items':items}
 json.dump(cat,open('catalog.json','w'),ensure_ascii=False,separators=(',',':'))
 import collections; print(len(items), collections.Counter(i['l'] for i in items), collections.Counter(i['src'] for i in items))
 print([ (i['cf'],i['t']) for i in items if i['l']==1][:40])
