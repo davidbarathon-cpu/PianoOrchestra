@@ -36,12 +36,12 @@ jobs:
             echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/po.jks"
             echo "PO_KEYSTORE=$RUNNER_TEMP/po.jks" >> "$GITHUB_ENV"
           else
-            echo "::warning::Pas de clé de signature : APK signée avec une clé de test"
+            # clé du projet (application personnelle) : toujours la même, donc les mises à jour s'installent
+            echo "PO_KEYSTORE=$GITHUB_WORKSPACE/signing/piano-orchestra.jks" >> "$GITHUB_ENV"
+            echo "PO_KEYSTORE_PASSWORD=PianoBermet2026" >> "$GITHUB_ENV"
           fi
 
       - name: Tests du moteur (sons, morceaux, rendu audio)
-        env:
-          PO_KEYSTORE_PASSWORD: ${{ secrets.PO_KEYSTORE_PASSWORD }}
         run: ./gradlew --no-daemon testReleaseUnitTest 2>&1 | tee test.log || true
 
       - name: Résultat des tests
@@ -49,8 +49,6 @@ jobs:
           grep -q "BUILD SUCCESSFUL" test.log || { tail -200 test.log; exit 1; }
 
       - name: Compiler l'APK
-        env:
-          PO_KEYSTORE_PASSWORD: ${{ secrets.PO_KEYSTORE_PASSWORD }}
         run: |
           ./gradlew --no-daemon assembleRelease
           mkdir -p out
@@ -114,15 +112,7 @@ jobs:
           name: apk
           path: out
 
-      - name: Vérifier la signature
-        env:
-          HAS_KEY: ${{ secrets.PO_KEYSTORE_B64 != '' }}
-        run: |
-          if [ "$HAS_KEY" != "true" ]; then echo "::warning::Pas de clé : pas de publication"; exit 0; fi
-          echo "PUBLISH=1" >> "$GITHUB_ENV"
-
       - uses: softprops/action-gh-release@v2
-        if: env.PUBLISH == '1'
         with:
           tag_name: b${{ github.run_number }}
           name: Piano Orchestra 0.1.${{ github.run_number }}
