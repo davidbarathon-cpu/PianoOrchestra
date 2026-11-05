@@ -138,6 +138,31 @@
     <string name="take_free">Jeu libre</string>
     <string name="record_free_sub">Enregistre ce que tu joues ; la prise s’ajoute à « Mes morceaux ».</string>
 
+    <!-- Jeu libre -->
+    <string name="menu_freeplay">Jeu libre</string>
+    <string name="menu_freeplay_sub">Joue des accords, le groupe suit</string>
+    <string name="style_pop">Pop</string>
+    <string name="style_ballade">Ballade</string>
+    <string name="style_rock">Rock</string>
+    <string name="style_valse">Valse</string>
+    <string name="style_bossa">Bossa nova</string>
+    <string name="style_jazz">Jazz</string>
+    <string name="styles">Style</string>
+    <string name="start">Démarrer</string>
+    <string name="variation">Variation</string>
+    <string name="ending">Fin</string>
+    <string name="sync_start">Démarrer au premier accord</string>
+    <string name="sync_start_sub">Le groupe part dès que tu joues un accord.</string>
+    <string name="left_hand">Accords à la main gauche</string>
+    <string name="left_hand_sub">Seules les notes sous le do du milieu comptent ; la main droite joue librement.</string>
+    <string name="instruments">Instruments</string>
+    <string name="part_drums">Batterie</string>
+    <string name="part_bass">Basse</string>
+    <string name="part_comp">Accompagnement</string>
+    <string name="part_pad">Nappe</string>
+    <string name="chord_hint">Joue un accord de la main gauche…</string>
+    <string name="bpm_value">%1$d BPM</string>
+
     <string-array name="note_names">
         <item>do</item>
         <item>do♯</item>

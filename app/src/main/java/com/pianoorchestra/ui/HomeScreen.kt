@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Piano
 import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material.icons.rounded.Tune
@@ -117,12 +118,16 @@ fun HomeScreen(app: App, lang: String, onLang: (String) -> Unit, onOpen: (Screen
             // les trois grandes portes
             val cards = listOf<@Composable (Modifier) -> Unit>(
                 { m -> BigCard(Icons.Rounded.LibraryMusic, stringResource(R.string.menu_playalong), stringResource(R.string.menu_playalong_sub), m) { onOpen(Screen.PLAYALONG) } },
+                { m -> BigCard(Icons.Rounded.MusicNote, stringResource(R.string.menu_freeplay), stringResource(R.string.menu_freeplay_sub), m, accent = Po.Gold) { onOpen(Screen.FREEPLAY) } },
                 { m -> BigCard(Icons.Rounded.Piano, stringResource(R.string.menu_keyboard), stringResource(R.string.menu_keyboard_sub), m, accent = Po.Teal) { onOpen(Screen.KEYBOARD) } },
                 { m -> BigCard(Icons.Rounded.Tune, stringResource(R.string.menu_settings), stringResource(R.string.menu_settings_sub), m, accent = Po.GoldSoft) { onOpen(Screen.SETTINGS) } },
             )
             if (wide) {
-                Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    cards.forEachIndexed { i, c -> c(Modifier.weight(if (i == 0) 1.3f else 1f)) }
+                // deux rangées de deux grandes cartes
+                for (row in cards.chunked(2)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                        row.forEach { c -> c(Modifier.weight(1f)) }
+                    }
                 }
             } else {
                 cards.forEach { c -> c(Modifier.fillMaxWidth()) }

@@ -166,4 +166,4 @@ fun noteLabel(note: Int, names: Array<String>, lang: String): String {
 }
 
 /** Les écrans de l'application. */
-enum class Screen { HOME, KEYBOARD, PLAYALONG, SETTINGS }
+enum class Screen { HOME, KEYBOARD, PLAYALONG, FREEPLAY, SETTINGS }

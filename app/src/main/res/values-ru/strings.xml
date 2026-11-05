@@ -131,6 +131,31 @@
     <string name="take_free">Свободная игра</string>
     <string name="record_free_sub">Запиши свою игру; запись появится в «Мои песни».</string>
 
+    <!-- Свободная игра -->
+    <string name="menu_freeplay">Свободная игра</string>
+    <string name="menu_freeplay_sub">Играй аккорды — группа подхватит</string>
+    <string name="style_pop">Поп</string>
+    <string name="style_ballade">Баллада</string>
+    <string name="style_rock">Рок</string>
+    <string name="style_valse">Вальс</string>
+    <string name="style_bossa">Босса-нова</string>
+    <string name="style_jazz">Джаз</string>
+    <string name="styles">Стиль</string>
+    <string name="start">Старт</string>
+    <string name="variation">Вариация</string>
+    <string name="ending">Концовка</string>
+    <string name="sync_start">Старт с первого аккорда</string>
+    <string name="sync_start_sub">Группа начинает, как только ты сыграешь аккорд.</string>
+    <string name="left_hand">Аккорды левой рукой</string>
+    <string name="left_hand_sub">Учитываются только ноты ниже до первой октавы; правая рука играет свободно.</string>
+    <string name="instruments">Инструменты</string>
+    <string name="part_drums">Ударные</string>
+    <string name="part_bass">Бас</string>
+    <string name="part_comp">Аккомпанемент</string>
+    <string name="part_pad">Фон</string>
+    <string name="chord_hint">Сыграй аккорд левой рукой…</string>
+    <string name="bpm_value">%1$d уд/мин</string>
+
     <string-array name="note_names">
         <item>до</item>
         <item>до♯</item>

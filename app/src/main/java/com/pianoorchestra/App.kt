@@ -105,6 +105,7 @@ class App : Application() {
     lateinit var updater: Updater
     lateinit var audio: AudioEngine
     val player = SongPlayer()
+    val band = com.pianoorchestra.band.Band()
     val live = LiveInput()
 
     private val _soundState = MutableStateFlow(SoundState.LOADING)
@@ -127,6 +128,7 @@ class App : Application() {
         midi.addListener { s, a, b ->
             live.onMidi(s, a, b)
             player.onLive(s, a, b)
+            band.onLive(s, a, b)
             recorder.onMidi(s, a, b)
             val s2 = synth ?: return@addListener
             if (!prefs.echo) return@addListener
@@ -138,6 +140,7 @@ class App : Application() {
         }
         midi.start()
         player.onRecorded = { bytes, title -> saveTake(bytes, title) }
+        band.onStart = { player.stop() }
         loadSounds()
         updater.check(quiet = true)
     }
@@ -149,7 +152,7 @@ class App : Application() {
                 val sf = SoundFont(bytes)
                 val s = Synth(sf, audio.sampleRate)
                 s.masterGain = prefs.masterVolume
-                s.sequencer = player
+                s.sequencer = com.pianoorchestra.audio.Sequencer { sy, f, r -> player.advance(sy, f, r); band.advance(sy, f, r) }
                 s.sendOn(0xC0, echoChannel, prefs.echoProgram, 0)
                 synth = s
                 applyOutput()
@@ -196,6 +199,16 @@ class App : Application() {
     }
 
     /** Le clavier à l'écran joue sur la tablette. */
-    fun screenNoteOn(note: Int) { synth?.sendOn(0x90, echoChannel, note, 96) }
-    fun screenNoteOff(note: Int) { synth?.sendOn(0x80, echoChannel, note, 0) }
+    fun screenNoteOn(note: Int) {
+        synth?.sendOn(0x90, echoChannel, note, 96)
+        player.onLive(0x90, note, 96)
+        band.onLive(0x90, note, 96)
+        live.onMidi(0x90, note, 96)
+    }
+    fun screenNoteOff(note: Int) {
+        synth?.sendOn(0x80, echoChannel, note, 0)
+        player.onLive(0x80, note, 0)
+        band.onLive(0x80, note, 0)
+        live.onMidi(0x80, note, 0)
+    }
 }

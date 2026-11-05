@@ -265,7 +265,7 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
                                     Modifier.size(84.dp).clip(CircleShape).background(if (state.playing) Po.Teal else Po.Gold)
-                                        .clickable { if (state.playing) app.player.stop() else app.player.play() },
+                                        .clickable { if (state.playing) app.player.stop() else { app.band.stop(); app.player.play() } },
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(if (state.playing) Icons.Rounded.Stop else Icons.Rounded.PlayArrow,

@@ -26,6 +26,7 @@ for lang in fr ru; do
   shot "tablette-${lang}-3-morceaux" --es po_lang $lang --es po_screen playalong
   WAIT=10 shot "tablette-${lang}-4-groupe" --es po_lang $lang --ei po_song 0
   shot "tablette-${lang}-5-reglages" --es po_lang $lang --es po_screen settings
+  WAIT=12 shot "tablette-${lang}-7-jeu-libre" --es po_lang $lang --es po_screen freeplay --es po_chord 45,48,52
 done
 
 # le groupe joue-t-il vraiment ? on lance la lecture et on vérifie que le temps avance

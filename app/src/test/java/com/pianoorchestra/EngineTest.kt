@@ -137,6 +137,34 @@ class EngineTest {
         }
     }
 
+    @Test
+    fun chordDetection() {
+        val cases = mapOf(listOf(48, 52, 55) to "C", listOf(52, 55, 60) to "C", listOf(57, 60, 64) to "Am", listOf(43, 47, 50, 53) to "G7",
+            listOf(50, 53, 57, 60) to "Dm7", listOf(48) to "C", listOf(45, 48) to "Am", listOf(41, 45, 48, 52) to "Fmaj7", listOf(46, 50, 53) to "Bb")
+        for ((notes, name) in cases) assertEquals(name, com.pianoorchestra.band.ChordDetector.detect(notes)?.name)
+    }
+
+    @Test
+    fun bandPlaysEveryStyle() {
+        for (st in com.pianoorchestra.band.Style.ALL) {
+            val synth = Synth(sf, 32000)
+            val band = com.pianoorchestra.band.Band()
+            synth.sequencer = band
+            band.setStyle(st.id)
+            val l = FloatArray(512); val r = FloatArray(512)
+            var sum = 0.0; var n = 0
+            for (chord in listOf(listOf(48, 52, 55), listOf(45, 48, 52), listOf(41, 45, 48), listOf(43, 47, 50))) {
+                for (x in chord) band.onLive(0x90, x, 80)
+                synth.render(l, r, 512)
+                for (x in chord) band.onLive(0x80, x, 0)
+                repeat(200) { synth.render(l, r, 512); for (v in l) { sum += v * v; n++ } }
+            }
+            val rms = sqrt(sum / n)
+            println("style ${st.id} : RMS ${"%.3f".format(rms)}, accord ${band.state.value.chord}")
+            assertTrue("le style ${st.id} doit jouer", band.state.value.running && rms > 0.01)
+        }
+    }
+
     private fun writeWav(f: File, pcm: ShortArray, rate: Int) {
         DataOutputStream(FileOutputStream(f).buffered()).use { o ->
             fun le32(v: Int) { o.write(v and 0xFF); o.write((v shr 8) and 0xFF); o.write((v shr 16) and 0xFF); o.write((v shr 24) and 0xFF) }
