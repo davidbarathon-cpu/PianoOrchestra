@@ -5,6 +5,10 @@ set -u
 APK=$(ls "$1"/*.apk | head -1)
 mkdir -p shots
 adb install -r "$APK"
+# l'émulateur affiche parfois « Pixel Launcher isn't responding » : on masque ces fenêtres et on le laisse se calmer
+adb shell settings put global hide_error_dialogs 1
+adb shell input keyevent KEYCODE_HOME
+sleep 40
 adb logcat -c
 PKG=com.pianoorchestra
 
