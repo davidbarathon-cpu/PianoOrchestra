@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
@@ -145,39 +146,58 @@ fun PianoKeyboard(
                     textSize = (ww * 0.42f).coerceIn(9f, 28f)
                     textAlign = android.graphics.Paint.Align.CENTER
                 }
-                // touches blanches
+                val h = size.height
+                val gap = (ww * 0.06f).coerceIn(1.5f, 3f)
+                val r = CornerRadius(ww * 0.16f)
+                val acc = Po.ambiance
+                // le lit du clavier, sombre, qu'on aperçoit entre les touches
+                drawRect(Brush.verticalGradient(listOf(Color(0xFF07070F), Color(0xFF16152A))))
+                // touches blanches : ivoire nacré, légère ombre en bas
                 for ((n, k) in whiteIndex) {
                     val x = k * ww
-                    val color = when {
-                        n in pressed -> Po.Teal
-                        n in guide -> Po.Gold
-                        else -> Color(0xFFF7F4EC)
+                    val isPressed = n in pressed
+                    val isGuide = n in guide
+                    val brush = when {
+                        isPressed -> Brush.verticalGradient(listOf(Color(0xFFB8FFF4), Color(0xFF5ED3C3), Color(0xFF2FA597)), 0f, h)
+                        isGuide -> Brush.verticalGradient(listOf(acc.accentLight, acc.accent, acc.accentDeep), 0f, h)
+                        else -> Brush.verticalGradient(listOf(Color(0xFFE9E5DC), Color(0xFFFBF9F4), Color(0xFFF4F0E7), Color(0xFFDCD6CA)), 0f, h)
                     }
-                    drawRoundRect(color, Offset(x + 1f, 0f), Size(ww - 2f, size.height), CornerRadius(ww * 0.18f))
-                    if (n in pressed && n in guide) {
-                        drawRoundRect(Po.Gold, Offset(x + 3f, 3f), Size(ww - 6f, size.height - 6f), CornerRadius(ww * 0.18f), style = Stroke(width = 5f))
+                    drawRoundRect(brush, Offset(x + gap / 2, -r.x), Size(ww - gap, h + r.x), r)
+                    // la tranche de la touche, plus sombre (sauf enfoncée : elle descend)
+                    if (!isPressed) drawRoundRect(Color.Black.copy(alpha = 0.10f), Offset(x + gap / 2, h - ww * 0.22f), Size(ww - gap, ww * 0.22f), r)
+                    if (isPressed && isGuide) {
+                        drawRoundRect(acc.accent, Offset(x + 3f, 3f), Size(ww - 6f, h - 6f), r, style = Stroke(width = 5f))
                     }
                     if (n % 12 == 0) {                                   // les do, pour se repérer
-                        paint.color = (if (n == 60) Po.Gold else Color(0xFF6B6E8E)).toArgb()
+                        paint.color = (if (n == 60) acc.accentDeep else Color(0xFF8A8BA6)).toArgb()
                         paint.isFakeBoldText = n == 60
-                        drawContext.canvas.nativeCanvas.drawText(noteNames[0], x + ww / 2, size.height - ww * 0.35f, paint)
+                        drawContext.canvas.nativeCanvas.drawText(noteNames[0], x + ww / 2, h - ww * 0.42f, paint)
                     }
                 }
-                // touches noires
+                // touches noires : laquées, avec un reflet
                 for (n in LOWEST..HIGHEST) if (!isWhite(n)) {
                     val left = (whiteIndex[n - 1] ?: continue) * ww + ww - bw / 2
-                    val color = when {
-                        n in pressed -> Color(0xFF2FA597)
-                        n in guide -> Color(0xFFC0913F)
-                        else -> Color(0xFF15172B)
+                    val isPressed = n in pressed
+                    val isGuide = n in guide
+                    val brush = when {
+                        isPressed -> Brush.verticalGradient(listOf(Color(0xFF5ED3C3), Color(0xFF1F7F74)), 0f, bh)
+                        isGuide -> Brush.verticalGradient(listOf(acc.accent, acc.accentDeep.copy(alpha = 1f)), 0f, bh)
+                        else -> Brush.verticalGradient(listOf(Color(0xFF0C0C18), Color(0xFF2A2A40), Color(0xFF111120)), 0f, bh)
                     }
-                    drawRoundRect(color, Offset(left, 0f), Size(bw, bh), CornerRadius(bw * 0.2f))
-                    if (n in pressed && n in guide) {
-                        drawRoundRect(Po.Gold, Offset(left + 2f, 2f), Size(bw - 4f, bh - 4f), CornerRadius(bw * 0.2f), style = Stroke(width = 4f))
+                    drawRoundRect(Color.Black.copy(alpha = 0.35f), Offset(left + 2f, 0f), Size(bw, bh + 4f), CornerRadius(bw * 0.2f))
+                    drawRoundRect(brush, Offset(left, -bw * 0.2f), Size(bw, bh + bw * 0.2f), CornerRadius(bw * 0.2f))
+                    // reflet vertical et biseau du bout de la touche
+                    drawRoundRect(Color.White.copy(alpha = if (isPressed || isGuide) 0.30f else 0.14f),
+                        Offset(left + bw * 0.18f, bh * 0.06f), Size(bw * 0.16f, bh * 0.70f), CornerRadius(bw * 0.08f))
+                    drawRoundRect(Color.White.copy(alpha = 0.10f), Offset(left + bw * 0.1f, bh - bw * 0.42f), Size(bw * 0.8f, bw * 0.30f), CornerRadius(bw * 0.12f))
+                    if (isPressed && isGuide) {
+                        drawRoundRect(acc.accentLight, Offset(left + 2f, 2f), Size(bw - 4f, bh - 4f), CornerRadius(bw * 0.2f), style = Stroke(width = 4f))
                     }
                 }
+                // l'ombre du feutre sur le haut des touches
+                drawRect(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.45f), Color.Transparent), 0f, h * 0.10f), Offset.Zero, Size(size.width, h * 0.10f))
                 // fine ligne dorée en haut, comme le feutre d'un piano
-                drawRect(Po.Gold.copy(alpha = 0.7f), Offset(0f, 0f), Size(size.width, 3f))
+                drawRect(Brush.horizontalGradient(listOf(acc.accentDeep, acc.accentLight, acc.accentDeep)), Offset(0f, 0f), Size(size.width, 3f))
             }
         }
         }

@@ -1,5 +1,9 @@
 package com.pianoorchestra.ui
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.Description
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -166,11 +170,8 @@ private fun SongList(
     var toDelete by remember { mutableStateOf<SongLibrary.Entry?>(null) }
     Column(Modifier.fillMaxSize()) {
         TopBar(stringResource(R.string.songs_title), onBack) {
-            TextButton(onClick = onImport) {
-                Icon(Icons.Rounded.Add, null, tint = Po.Gold)
-                Spacer(Modifier.width(6.dp))
-                Text(stringResource(R.string.import_song), color = Po.Gold, fontSize = 17.sp)
-            }
+            GlassPill(stringResource(R.string.import_song), Icons.Rounded.Add, onClick = onImport)
+            Spacer(Modifier.width(8.dp))
         }
         LazyVerticalGrid(
             columns = GridCells.Adaptive(300.dp),
@@ -203,6 +204,15 @@ private fun SongList(
     }
 }
 
+private val COVERS = listOf(
+    Color(0xFFF3CC86) to Color(0xFFC98B36),
+    Color(0xFFB9A6FF) to Color(0xFF6E54FF),
+    Color(0xFF8FF0E3) to Color(0xFF2E9C8F),
+    Color(0xFFFFB3CF) to Color(0xFFD9578A),
+    Color(0xFF9CC3FF) to Color(0xFF3A6BD9),
+    Color(0xFFFFC59A) to Color(0xFFE0703A),
+)
+
 @Composable
 private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, onDelete: (() -> Unit)? = null, onShare: (() -> Unit)? = null) {
     Row(
@@ -213,13 +223,23 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
             .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // une petite « pochette » colorée, différente pour chaque morceau
+        val (c1, c2) = COVERS[(e.id.hashCode() and 0x7fffffff) % COVERS.size]
         Box(
-            Modifier.size(56.dp).clip(RoundedCornerShape(18.dp)).background(Po.Gold.copy(alpha = 0.15f)),
+            Modifier.size(62.dp).clip(RoundedCornerShape(19.dp))
+                .background(Brush.linearGradient(listOf(c1, c2)))
+                .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(19.dp)),
             contentAlignment = Alignment.Center
-        ) { Icon(Icons.Rounded.MusicNote, null, tint = Po.Gold, modifier = Modifier.size(30.dp)) }
+        ) {
+            Icon(when {
+                e.isPdf -> Icons.Rounded.Description
+                e.isScore -> Icons.Rounded.LibraryMusic
+                else -> Icons.Rounded.MusicNote
+            }, null, tint = Color.White, modifier = Modifier.size(30.dp))
+        }
         Spacer(Modifier.width(16.dp))
         Column(Modifier.weight(1f)) {
-            Text(e.title(lang), color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(e.title(lang), color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.Medium, maxLines = 2, overflow = TextOverflow.Ellipsis)
             Text(e.style(lang), color = Po.Muted, fontSize = 16.sp)
         }
         if (onShare != null) {
