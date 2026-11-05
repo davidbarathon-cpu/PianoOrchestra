@@ -184,4 +184,11 @@
         <item>si♭</item>
         <item>si</item>
     </string-array>
+    <string name="resume">Reprendre</string>
+    <string name="resume_empty">Choisis un morceau pour commencer</string>
+    <string name="sounds_ready">Câble USB · sons prêts</string>
+    <string name="settings_ambiance">Ambiance</string>
+    <string name="ambiance_nuit">Nuit</string>
+    <string name="ambiance_aurore">Aurore</string>
+    <string name="ambiance_ocean">Océan</string>
 </resources>

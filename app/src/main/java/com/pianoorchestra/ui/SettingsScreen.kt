@@ -1,5 +1,19 @@
 package com.pianoorchestra.ui
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.Icon
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import android.media.AudioDeviceInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +68,18 @@ fun SettingsScreen(app: App, onBack: () -> Unit) {
                 .widthIn(max = 900.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Panel(Modifier.fillMaxWidth()) {
+                Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                    SectionTitle(stringResource(R.string.settings_ambiance))
+                    Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                        for (a in Ambiance.entries) {
+                            AmbianceTile(a, Po.ambiance == a, Modifier.weight(1f)) {
+                                Po.ambiance = a; app.prefs.ambiance = a.key
+                            }
+                        }
+                    }
+                }
+            }
             Panel(Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     SectionTitle(stringResource(R.string.settings_sound))
@@ -115,6 +141,39 @@ fun SettingsScreen(app: App, onBack: () -> Unit) {
                 }
             }
             Text(stringResource(R.string.credits), color = Po.Muted, fontSize = 14.sp, modifier = Modifier.padding(bottom = 24.dp))
+        }
+    }
+}
+
+/** Un aperçu de l'ambiance : son dégradé, ses lumières et une petite carte de verre. */
+@Composable
+private fun AmbianceTile(a: Ambiance, selected: Boolean, modifier: Modifier, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(22.dp)
+    Column(
+        modifier
+            .clip(shape)
+            .border(if (selected) 2.dp else 1.dp, if (selected) a.accent else Po.Stroke, shape)
+            .clickable(onClick = onClick)
+    ) {
+        Box(
+            Modifier.fillMaxWidth().height(110.dp)
+                .background(Brush.linearGradient(a.bg))
+                .background(Brush.radialGradient(listOf(a.glow1.copy(alpha = 0.55f), Color.Transparent), center = Offset(40f, 20f), radius = 260f))
+                .background(Brush.radialGradient(listOf(a.glow2.copy(alpha = 0.45f), Color.Transparent), center = Offset(600f, 300f), radius = 300f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Box(Modifier.size(width = 120.dp, height = 56.dp).glass(RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+                Box(Modifier.size(26.dp).clip(CircleShape).background(Brush.linearGradient(listOf(a.accentLight, a.accentDeep))))
+            }
+        }
+        Row(Modifier.fillMaxWidth().background(Color.White.copy(alpha = 0.05f)).padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(when (a) {
+                Ambiance.NUIT -> R.string.ambiance_nuit
+                Ambiance.AURORE -> R.string.ambiance_aurore
+                Ambiance.OCEAN -> R.string.ambiance_ocean
+            }), color = Po.Text, fontSize = 18.sp, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal, modifier = Modifier.weight(1f))
+            if (selected) Icon(Icons.Rounded.Check, null, tint = a.accent)
         }
     }
 }

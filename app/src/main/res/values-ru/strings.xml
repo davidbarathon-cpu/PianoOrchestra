@@ -177,4 +177,11 @@
         <item>си♭</item>
         <item>си</item>
     </string-array>
+    <string name="resume">Продолжить</string>
+    <string name="resume_empty">Выбери пьесу, чтобы начать</string>
+    <string name="sounds_ready">USB-кабель · звуки готовы</string>
+    <string name="settings_ambiance">Оформление</string>
+    <string name="ambiance_nuit">Ночь</string>
+    <string name="ambiance_aurore">Заря</string>
+    <string name="ambiance_ocean">Океан</string>
 </resources>

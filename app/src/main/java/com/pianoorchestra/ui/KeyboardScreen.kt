@@ -184,11 +184,9 @@ fun Chip(label: String, selected: Boolean, onClick: () -> Unit) {
         label,
         color = if (selected) Po.Night else Po.Text,
         fontSize = 17.sp,
-        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (selected) Po.Gold else Po.CardHigh)
-            .border(1.dp, if (selected) Po.Gold else Po.Stroke, RoundedCornerShape(50))
+        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        modifier = (if (selected) Modifier.clip(RoundedCornerShape(50)).background(Po.accentBrush)
+                    else Modifier.glass(RoundedCornerShape(50)))
             .clickable(onClick = onClick)
             .padding(horizontal = 18.dp, vertical = 10.dp)
     )

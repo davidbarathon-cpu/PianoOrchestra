@@ -164,7 +164,7 @@ fun ScoreView(app: App, lang: String, entry: SongLibrary.Entry, onBack: () -> Un
             if (!rendered && error == null) CircularProgressIndicator(Modifier.align(Alignment.Center), color = Po.Gold)
             error?.let {
                 Text(stringResource(R.string.import_failed) + "\n" + it, color = Po.Danger, fontSize = 16.sp,
-                    modifier = Modifier.align(Alignment.Center).background(Po.Card).padding(20.dp))
+                    modifier = Modifier.align(Alignment.Center).background(Po.Solid).padding(20.dp))
             }
         }
 
@@ -175,7 +175,7 @@ fun ScoreView(app: App, lang: String, entry: SongLibrary.Entry, onBack: () -> Un
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Box(
-                Modifier.size(64.dp).clip(CircleShape).background(if (state.playing) Po.Teal else Po.Gold)
+                Modifier.size(64.dp).clip(CircleShape).background(if (state.playing) Po.tealBrush else Po.accentBrush)
                     .clickable(enabled = song != null) { if (state.playing) app.player.stop() else app.player.play() },
                 contentAlignment = Alignment.Center
             ) { Icon(if (state.playing) Icons.Rounded.Stop else Icons.Rounded.PlayArrow, null, tint = Po.Night, modifier = Modifier.size(40.dp)) }

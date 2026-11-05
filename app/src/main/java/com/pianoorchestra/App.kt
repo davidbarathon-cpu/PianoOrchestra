@@ -28,6 +28,13 @@ class Prefs(context: Context) {
     var outputType: Int
         get() = sp.getInt("output_type", -1)
         set(v) { sp.edit().putInt("output_type", v).apply() }
+    var ambiance: String
+        get() = sp.getString("ambiance", "nuit") ?: "nuit"
+        set(v) { sp.edit().putString("ambiance", v).apply() }
+    /** Le dernier morceau ouvert, pour « Reprendre » sur l'accueil. */
+    var lastSong: String?
+        get() = sp.getString("last_song", null)
+        set(v) { sp.edit().putString("last_song", v).apply() }
     var masterVolume: Float
         get() = sp.getFloat("master_volume", 0.7f)
         set(v) { sp.edit().putFloat("master_volume", v).apply() }

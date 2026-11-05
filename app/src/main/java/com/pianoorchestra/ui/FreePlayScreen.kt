@@ -1,5 +1,12 @@
 package com.pianoorchestra.ui
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,24 +74,35 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
             val wide = maxWidth > 760.dp
             val stage: @Composable (Modifier) -> Unit = { m ->
                 Panel(m) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxWidth()) {
-                        // l'accord, en très grand
-                        Text(
-                            st.chord?.let { MusicText.chord(it, lang) } ?: "—",
-                            color = Po.Gold, fontSize = 88.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center
-                        )
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+                        modifier = Modifier.fillMaxSize()) {
+                        // l'accord, en très grand, dans un anneau de lumière
+                        val accent = Po.Gold
+                        Box(Modifier.size(250.dp), contentAlignment = Alignment.Center) {
+                            Canvas(Modifier.fillMaxSize()) {
+                                val r = size.minDimension / 2f
+                                drawCircle(Brush.radialGradient(listOf(accent.copy(alpha = 0.22f), Color.Transparent)), r)
+                                drawCircle(accent.copy(alpha = 0.35f), r * 0.92f, style = Stroke(1.5.dp.toPx()))
+                                drawCircle(Color.White.copy(alpha = 0.12f), r * 0.76f, style = Stroke(1.dp.toPx()))
+                            }
+                            Text(
+                                st.chord?.let { MusicText.chord(it, lang) } ?: "—",
+                                fontSize = 92.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
+                                style = TextStyle(brush = Brush.verticalGradient(listOf(Color(0xFFFFF4DE), Po.GoldSoft, Po.ambiance.accentDeep)),
+                                    shadow = Shadow(accent.copy(alpha = 0.45f), blurRadius = 40f))
+                            )
+                        }
                         if (st.chord == null) Text(stringResource(R.string.chord_hint), color = Po.Muted, fontSize = 18.sp)
                         // les temps de la mesure
                         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                             for (b in 0 until style.beats) {
                                 Box(Modifier.size(20.dp).clip(CircleShape).background(
-                                    if (st.running && st.beat == b) (if (b == 0) Po.Gold else Po.Teal) else Po.Stroke))
+                                    if (st.running && st.beat == b) (if (b == 0) Po.Gold else Po.Teal) else Color.White.copy(alpha = 0.16f)))
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             Box(
-                                Modifier.size(96.dp).clip(CircleShape).background(if (st.running) Po.Teal else Po.Gold)
+                                Modifier.size(96.dp).clip(CircleShape).background(if (st.running) Po.tealBrush else Po.accentBrush)
                                     .clickable { app.band.startStop() },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -92,8 +110,8 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
                                     stringResource(if (st.running) R.string.stop else R.string.start),
                                     tint = Po.Night, modifier = Modifier.size(60.dp))
                             }
-                            BigButton("${stringResource(R.string.variation)} ${if (st.variation == 0) "A" else "B"}", Po.CardHigh) { app.band.variation() }
-                            BigButton(stringResource(R.string.ending), if (st.ending) Po.Danger else Po.CardHigh) { app.band.ending() }
+                            BigButton("${stringResource(R.string.variation)} ${if (st.variation == 0) "A" else "B"}", null) { app.band.variation() }
+                            BigButton(stringResource(R.string.ending), if (st.ending) Po.Danger else null) { app.band.ending() }
                         }
                     }
                 }
@@ -138,7 +156,7 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
             }
             if (wide) {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.fillMaxSize()) {
-                    stage(Modifier.weight(1f))
+                    stage(Modifier.weight(1.15f).fillMaxHeight())
                     settings(Modifier.weight(1f).verticalScroll(rememberScrollState()))
                 }
             } else {
@@ -155,10 +173,11 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
 }
 
 @Composable
-private fun BigButton(label: String, color: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+private fun BigButton(label: String, color: Color?, onClick: () -> Unit) {
     Text(
-        label, color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(color).clickable(onClick = onClick)
+        label, color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.Medium,
+        modifier = (if (color != null) Modifier.clip(RoundedCornerShape(22.dp)).background(color) else Modifier.glass(RoundedCornerShape(22.dp)))
+            .clickable(onClick = onClick)
             .padding(horizontal = 22.dp, vertical = 18.dp)
     )
 }

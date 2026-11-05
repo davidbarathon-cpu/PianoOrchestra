@@ -81,7 +81,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = -1, autoPlay: Boolean = false) {
+fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = -1, autoPlay: Boolean = false, openId: String? = null) {
     val state by app.player.state.collectAsState()
     // gardé quand l'écran tourne : l'identifiant du morceau ouvert
     var openedId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -103,6 +103,7 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     // ouvrir un morceau : lecture du fichier en arrière-plan, puis « ma partie » choisie automatiquement
     LaunchedEffect(opened) {
         val e = opened ?: return@LaunchedEffect
+        app.prefs.lastSong = e.id
         if (e.isScore || e.isPdf) return@LaunchedEffect           // la partition se charge dans son propre écran
         val current = app.player.state.value
         if (current.playing && current.song?.name == e.title(lang)) return@LaunchedEffect   // déjà en cours (écran tourné)
@@ -120,7 +121,8 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     }
     LaunchedEffect(autoOpen) {
         if (openedId == null) {
-            if (autoOpen in app.library.builtIn.indices) openedId = app.library.builtIn[autoOpen].id
+            if (openId != null) openedId = openId
+            else if (autoOpen in app.library.builtIn.indices) openedId = app.library.builtIn[autoOpen].id
             else if (autoOpen - 100 in app.library.builtInScores.indices) openedId = app.library.builtInScores[autoOpen - 100].id
         }
     }
@@ -206,9 +208,7 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
     Row(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(Po.Card)
-            .border(1.dp, Po.Stroke, RoundedCornerShape(24.dp))
+            .glass(RoundedCornerShape(24.dp))
             .clickable(onClick = onClick)
             .padding(20.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -276,7 +276,7 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit) {
                         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
-                                    Modifier.size(84.dp).clip(CircleShape).background(if (state.playing) Po.Teal else Po.Gold)
+                                    Modifier.size(84.dp).clip(CircleShape).background(if (state.playing) Po.tealBrush else Po.accentBrush)
                                         .clickable { if (state.playing) app.player.stop() else { app.band.stop(); app.player.play() } },
                                     contentAlignment = Alignment.Center
                                 ) {

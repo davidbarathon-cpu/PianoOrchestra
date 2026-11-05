@@ -23,6 +23,8 @@ import com.pianoorchestra.ui.HomeScreen
 import com.pianoorchestra.ui.KeyboardScreen
 import com.pianoorchestra.ui.PlayAlongScreen
 import com.pianoorchestra.ui.PoTheme
+import com.pianoorchestra.ui.Po
+import com.pianoorchestra.ui.Ambiance
 import com.pianoorchestra.ui.Screen
 import com.pianoorchestra.ui.SettingsScreen
 import java.util.Locale
@@ -46,6 +48,8 @@ class MainActivity : ComponentActivity() {
         intent.getStringExtra("po_lang")?.let { l ->
             if (l != app.prefs.lang) { app.prefs.lang = l; recreate(); return }
         }
+        intent.getStringExtra("po_ambiance")?.let { app.prefs.ambiance = it }
+        Po.ambiance = Ambiance.of(app.prefs.ambiance)
         val startScreen = intent.getStringExtra("po_screen")?.let { s -> Screen.entries.firstOrNull { it.name.equals(s, true) } }
         val autoSong = intent.getIntExtra("po_song", -1)
         val autoPlay = intent.getBooleanExtra("po_autoplay", false)
@@ -66,12 +70,15 @@ class MainActivity : ComponentActivity() {
             PoTheme {
                 var screen by rememberSaveable { mutableStateOf(startScreen ?: (if (autoSong >= 0) Screen.PLAYALONG else Screen.HOME)) }
                 val lang = app.prefs.lang
+                var resumeId by rememberSaveable { mutableStateOf<String?>(null) }
                 Box(Modifier.fillMaxSize().systemBarsPadding()) {
                     BackHandler(enabled = screen != Screen.HOME) { screen = Screen.HOME }
                     when (screen) {
-                        Screen.HOME -> HomeScreen(app, lang, onLang = { l -> app.prefs.lang = l; recreate() }, onOpen = { screen = it })
+                        Screen.HOME -> HomeScreen(app, lang, onLang = { l -> app.prefs.lang = l; recreate() },
+                            onOpen = { resumeId = null; screen = it },
+                            onResume = { id -> resumeId = id; screen = Screen.PLAYALONG })
                         Screen.KEYBOARD -> KeyboardScreen(app, lang) { screen = Screen.HOME }
-                        Screen.PLAYALONG -> PlayAlongScreen(app, lang, onBack = { screen = Screen.HOME }, autoOpen = autoSong, autoPlay = autoPlay)
+                        Screen.PLAYALONG -> PlayAlongScreen(app, lang, onBack = { screen = Screen.HOME }, autoOpen = autoSong, autoPlay = autoPlay, openId = resumeId)
                         Screen.FREEPLAY -> FreePlayScreen(app, lang) { screen = Screen.HOME }
                         Screen.SETTINGS -> SettingsScreen(app) { screen = Screen.HOME }
                     }

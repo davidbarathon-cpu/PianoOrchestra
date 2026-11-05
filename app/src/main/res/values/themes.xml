@@ -5,6 +5,6 @@
         <item name="android:statusBarColor">@color/po_background</item>
         <item name="android:navigationBarColor">@color/po_background</item>
     </style>
-    <color name="po_background">#FF0E1020</color>
+    <color name="po_background">#FF0B0D1E</color>
     <color name="po_icon_background">#FF151832</color>
 </resources>

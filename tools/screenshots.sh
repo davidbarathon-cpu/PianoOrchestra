@@ -30,6 +30,15 @@ for lang in fr ru; do
   WAIT=12 shot "tablette-${lang}-7-jeu-libre" --es po_lang $lang --es po_screen freeplay --es po_chord 45,48,52
 done
 
+# les deux autres ambiances (Bermet choisit dans les réglages)
+WAIT=10 shot "tablette-fr-9-aurore-accueil" --es po_lang fr --es po_screen home --es po_ambiance aurore
+WAIT=12 shot "tablette-fr-10-aurore-jeu-libre" --es po_lang fr --es po_screen freeplay --es po_chord 48,52,55
+WAIT=10 shot "tablette-fr-11-ocean-accueil" --es po_lang fr --es po_screen home --es po_ambiance ocean
+shot "tablette-fr-12-ocean-reglages" --es po_lang fr --es po_screen settings
+WAIT=10 shot "tablette-fr-13-ocean-groupe" --es po_lang fr --ei po_song 2
+adb shell am start -S -W -n $PKG/.MainActivity --es po_ambiance nuit > /dev/null
+sleep 4
+
 # le groupe joue-t-il vraiment ? on lance la lecture et on vérifie que le temps avance
 adb shell am start -S -W -n $PKG/.MainActivity --es po_lang fr --ei po_song 1 --ez po_autoplay true > /dev/null
 sleep 14
