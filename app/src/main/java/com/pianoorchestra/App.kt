@@ -28,6 +28,11 @@ class Prefs(context: Context) {
     var outputType: Int
         get() = sp.getInt("output_type", -1)
         set(v) { sp.edit().putInt("output_type", v).apply() }
+    /** Le code à 4 chiffres de l'échange avec l'ordinateur (gardé : Riffmaker s'en souvient). */
+    var exchangeCode: String
+        get() = sp.getString("exchange_code", null) ?: newExchangeCode()
+        set(v) { sp.edit().putString("exchange_code", v).apply() }
+    fun newExchangeCode(): String = (1000 + java.security.SecureRandom().nextInt(9000)).toString().also { exchangeCode = it }
     var ambiance: String
         get() = sp.getString("ambiance", "nuit") ?: "nuit"
         set(v) { sp.edit().putString("ambiance", v).apply() }
@@ -199,6 +204,40 @@ class App : Application() {
 
     /** Le dernier enregistrement gardé (pour l'annoncer à l'écran). */
     val lastSaved = MutableStateFlow<String?>(null)
+
+    // ------------------------------------------------------------------ échange avec l'ordinateur
+    data class ExchangeLog(val kind: com.pianoorchestra.exchange.ExchangeServer.Kind, val name: String, val from: String, val time: Long)
+    val exchangeLog = MutableStateFlow<List<ExchangeLog>>(emptyList())
+    /** Change quand des morceaux arrivent : les listes se relisent. */
+    val libraryVersion = MutableStateFlow(0)
+    private var multicastLock: android.net.wifi.WifiManager.MulticastLock? = null
+    val exchange by lazy {
+        com.pianoorchestra.exchange.ExchangeServer(
+            com.pianoorchestra.exchange.FolderStore(library.songsDir),
+            code = { prefs.exchangeCode },
+            info = { mapOf("app" to "Piano Orchestra", "name" to getString(R.string.exchange_device_name),
+                "version" to BuildConfig.VERSION_NAME) },
+            page = { assets.open("exchange/index.html").use { it.readBytes() } },
+            onEvent = { e ->
+                exchangeLog.value = (listOf(ExchangeLog(e.kind, e.name, e.from, System.currentTimeMillis())) + exchangeLog.value).take(60)
+                if (e.kind == com.pianoorchestra.exchange.ExchangeServer.Kind.RECEIVED) libraryVersion.value++
+            })
+    }
+
+    fun startExchange(): Int {
+        val port = exchange.start()
+        if (multicastLock == null) runCatching {
+            val wifi = applicationContext.getSystemService(WIFI_SERVICE) as android.net.wifi.WifiManager
+            multicastLock = wifi.createMulticastLock("piano-orchestra").apply { setReferenceCounted(false); acquire() }
+        }
+        return port
+    }
+
+    fun stopExchange() {
+        exchange.stop()
+        runCatching { multicastLock?.release() }
+        multicastLock = null
+    }
     val recorder = FreeRecorder()
 
     private fun saveTake(bytes: ByteArray, title: String) {

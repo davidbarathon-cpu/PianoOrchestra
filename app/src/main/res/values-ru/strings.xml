@@ -204,4 +204,25 @@
     <string name="catalog_license">Лицензия: %1$s</string>
     <string name="catalog_credits">Источники: Mutopia Project (общественное достояние и Creative Commons) и ASAP (CC BY-NC-SA 4.0). Спасибо волонтёрам, которые набирают эти ноты.</string>
     <string name="see_pdf">Ноты PDF</string>
+    <string name="exchange_title">Обмен с компьютером</string>
+    <string name="exchange_short">Компьютер</string>
+    <string name="exchange_device_name">Планшет Бермет</string>
+    <string name="exchange_ready">Готов к обмену</string>
+    <string name="exchange_address">Адрес</string>
+    <string name="exchange_code">Код доступа</string>
+    <string name="exchange_new_code">Новый код</string>
+    <string name="exchange_no_wifi">Планшет не подключён к Wi-Fi. Подключи его к домашнему Wi-Fi или включи точку доступа и подключи к ней компьютер.</string>
+    <string name="exchange_error">Обмен не запустился. Закрой этот экран и открой снова.</string>
+    <string name="exchange_how">Как это сделать</string>
+    <string name="exchange_step1">Компьютер и планшет в одной сети Wi-Fi. Не закрывай этот экран.</string>
+    <string name="exchange_step2">В Riffmaker нажми «🎹 Piano Orchestra» — планшет найдётся сам. Или введи адрес в браузере компьютера.</string>
+    <string name="exchange_step3">Введи код доступа. Полученные пьесы появятся в «Моих пьесах».</string>
+    <string name="exchange_hotspot">Нет общего Wi-Fi? Включи точку доступа на планшете (Настройки › Сеть › Точка доступа) и подключи к ней компьютер — интернет не нужен.</string>
+    <string name="exchange_log">Обмен</string>
+    <string name="exchange_log_empty">Пока ничего.</string>
+    <string name="exchange_received">Получено</string>
+    <string name="exchange_sent">Отправлено на компьютер</string>
+    <string name="exchange_backup">Полная копия отправлена</string>
+    <string name="exchange_refused">Отклонено (тип файла)</string>
+    <string name="exchange_connected">Компьютер подключён</string>
 </resources>

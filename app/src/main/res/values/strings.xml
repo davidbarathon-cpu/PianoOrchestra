@@ -211,4 +211,25 @@
     <string name="catalog_license">Licence : %1$s</string>
     <string name="catalog_credits">Sources : Mutopia Project (domaine public et Creative Commons) et ASAP (CC BY-NC-SA 4.0). Merci aux bénévoles qui saisissent ces partitions.</string>
     <string name="see_pdf">Partition PDF</string>
+    <string name="exchange_title">Échanger avec l’ordinateur</string>
+    <string name="exchange_short">Ordinateur</string>
+    <string name="exchange_device_name">Tablette de Bermet</string>
+    <string name="exchange_ready">Prête à échanger</string>
+    <string name="exchange_address">Adresse</string>
+    <string name="exchange_code">Code d’accès</string>
+    <string name="exchange_new_code">Nouveau code</string>
+    <string name="exchange_no_wifi">La tablette n’est sur aucun wifi. Connecte-la au wifi de la maison, ou active son point d’accès et connecte l’ordinateur dessus.</string>
+    <string name="exchange_error">L’échange n’a pas pu démarrer. Ferme cet écran et rouvre-le.</string>
+    <string name="exchange_how">Comment faire</string>
+    <string name="exchange_step1">L’ordinateur et la tablette sont sur le même wifi. Laisse cet écran ouvert.</string>
+    <string name="exchange_step2">Dans Riffmaker, clique sur « 🎹 Piano Orchestra » : la tablette est trouvée toute seule. Ou, dans un navigateur de l’ordinateur, tape l’adresse ci-contre.</string>
+    <string name="exchange_step3">Tape le code d’accès. Les morceaux reçus arrivent dans « Mes morceaux ».</string>
+    <string name="exchange_hotspot">Pas de wifi commun ? Active le point d’accès de la tablette (Paramètres › Réseau › Point d’accès) et connecte l’ordinateur dessus : l’échange marche sans internet.</string>
+    <string name="exchange_log">Échanges</string>
+    <string name="exchange_log_empty">Rien pour l’instant.</string>
+    <string name="exchange_received">Reçu</string>
+    <string name="exchange_sent">Envoyé à l’ordinateur</string>
+    <string name="exchange_backup">Sauvegarde complète envoyée</string>
+    <string name="exchange_refused">Refusé (type de fichier)</string>
+    <string name="exchange_connected">Ordinateur connecté</string>
 </resources>

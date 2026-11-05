@@ -23,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.Computer
+import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.Piano
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -176,7 +178,9 @@ fun HomeScreen(app: App, lang: String, onLang: (String) -> Unit, onOpen: (Screen
             }
 
             // bas de page
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                GlassPill(stringResource(if (wide) R.string.exchange_title else R.string.exchange_short), Icons.Rounded.Computer) { onOpen(Screen.EXCHANGE) }
+                GlassPill(stringResource(if (wide) R.string.catalog_title else R.string.catalog_short), Icons.Rounded.CloudDownload) { onOpen(Screen.CATALOG) }
                 Spacer(Modifier.weight(1f))
                 Text(stringResource(R.string.version_label, BuildConfig.VERSION_NAME), color = Po.Muted.copy(alpha = 0.7f), fontSize = 14.sp)
             }

@@ -24,6 +24,7 @@ import com.pianoorchestra.ui.KeyboardScreen
 import com.pianoorchestra.ui.PlayAlongScreen
 import com.pianoorchestra.ui.PoTheme
 import com.pianoorchestra.ui.CatalogScreen
+import com.pianoorchestra.ui.ExchangeScreen
 import com.pianoorchestra.ui.Po
 import com.pianoorchestra.ui.Ambiance
 import com.pianoorchestra.ui.Screen
@@ -72,18 +73,20 @@ class MainActivity : ComponentActivity() {
                 var screen by rememberSaveable { mutableStateOf(startScreen ?: (if (autoSong >= 0) Screen.PLAYALONG else Screen.HOME)) }
                 val lang = app.prefs.lang
                 var resumeId by rememberSaveable { mutableStateOf<String?>(null) }
+                var catalogBack by rememberSaveable { mutableStateOf(Screen.PLAYALONG) }
                 Box(Modifier.fillMaxSize().systemBarsPadding()) {
-                    BackHandler(enabled = screen != Screen.HOME) { screen = if (screen == Screen.CATALOG) Screen.PLAYALONG else Screen.HOME }
+                    BackHandler(enabled = screen != Screen.HOME) { screen = if (screen == Screen.CATALOG) catalogBack else Screen.HOME }
                     when (screen) {
                         Screen.HOME -> HomeScreen(app, lang, onLang = { l -> app.prefs.lang = l; recreate() },
-                            onOpen = { resumeId = null; screen = it },
+                            onOpen = { resumeId = null; if (it == Screen.CATALOG) catalogBack = Screen.HOME; screen = it },
                             onResume = { id -> resumeId = id; screen = Screen.PLAYALONG })
                         Screen.KEYBOARD -> KeyboardScreen(app, lang) { screen = Screen.HOME }
                         Screen.PLAYALONG -> PlayAlongScreen(app, lang, onBack = { screen = Screen.HOME }, autoOpen = autoSong, autoPlay = autoPlay, openId = resumeId,
-                            onCatalog = { resumeId = null; screen = Screen.CATALOG })
+                            onCatalog = { resumeId = null; catalogBack = Screen.PLAYALONG; screen = Screen.CATALOG })
                         Screen.FREEPLAY -> FreePlayScreen(app, lang) { screen = Screen.HOME }
                         Screen.SETTINGS -> SettingsScreen(app) { screen = Screen.HOME }
-                        Screen.CATALOG -> CatalogScreen(app, lang, onBack = { screen = Screen.PLAYALONG },
+                        Screen.EXCHANGE -> ExchangeScreen(app) { screen = Screen.HOME }
+                        Screen.CATALOG -> CatalogScreen(app, lang, onBack = { screen = catalogBack },
                             onOpen = { id -> resumeId = id; screen = Screen.PLAYALONG })
                     }
                 }

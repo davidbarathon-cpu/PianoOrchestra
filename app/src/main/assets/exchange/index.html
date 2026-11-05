@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piano Orchestra – échange</title>
+<style>
+:root{--fond1:#0B0D1E;--fond2:#141632;--fond3:#1E1630;--or:#E8B86D;--or-clair:#F3CC86;--or-fonce:#D59A45;--turquoise:#5ED3C3;--texte:#F5F2EA;--discret:#B4B3CC;--verre:rgba(255,255,255,.07);--bord:rgba(255,255,255,.16);--erreur:#EF7A85}
+*{box-sizing:border-box}
+html{background:#0B0D1E}
+html,body{margin:0;min-height:100%}
+body{font-family:"Segoe UI",system-ui,-apple-system,sans-serif;color:var(--texte);background:linear-gradient(160deg,var(--fond1),var(--fond2) 55%,var(--fond3));background-attachment:fixed;min-height:100vh}
+body:before,body:after{content:"";position:fixed;border-radius:50%;filter:blur(40px);z-index:-1;pointer-events:none}
+body:before{width:60vw;height:60vw;left:-15vw;top:-25vw;background:radial-gradient(circle,rgba(110,84,255,.45),transparent 70%)}
+body:after{width:50vw;height:50vw;right:-15vw;bottom:-25vw;background:radial-gradient(circle,rgba(232,184,109,.35),transparent 70%)}
+main{max-width:1080px;margin:0 auto;padding:36px 20px 60px}
+.surtitre{letter-spacing:5px;font-size:13px;font-weight:600;color:var(--or)}
+h1{font-weight:500;font-size:40px;margin:6px 0 4px}
+.sous{color:var(--discret);font-size:17px;margin:0 0 26px}
+.verre{background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.045));border:1px solid var(--bord);border-top-color:rgba(255,255,255,.3);border-radius:24px;backdrop-filter:blur(22px) saturate(140%);-webkit-backdrop-filter:blur(22px) saturate(140%);box-shadow:0 20px 44px rgba(0,0,0,.32)}
+.bloc{padding:22px 24px;margin-bottom:18px}
+.titre-bloc{font-size:12px;letter-spacing:2.5px;font-weight:600;color:var(--or);margin:0 0 12px}
+button,.bouton{font:inherit;font-size:16px;border:1px solid var(--bord);background:rgba(255,255,255,.08);color:var(--texte);border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+button:hover,.bouton:hover{background:rgba(255,255,255,.14)}
+.principal{background:linear-gradient(135deg,var(--or-clair),var(--or-fonce));color:#14121F;border:none;font-weight:600}
+.principal:hover{filter:brightness(1.07);background:linear-gradient(135deg,var(--or-clair),var(--or-fonce))}
+input[type=text]{font:inherit;font-size:28px;letter-spacing:12px;text-align:center;width:200px;padding:10px;border-radius:16px;border:1px solid var(--bord);background:rgba(0,0,0,.25);color:var(--texte)}
+#zone{border:2px dashed rgba(255,255,255,.22);border-radius:20px;padding:34px;text-align:center;color:var(--discret);transition:.15s}
+#zone.survol{border-color:var(--or);background:rgba(232,184,109,.08);color:var(--texte)}
+#zone strong{color:var(--texte);font-size:19px;font-weight:500;display:block;margin-bottom:6px}
+.ligne{display:flex;align-items:center;gap:14px;padding:12px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
+.ligne:last-child{border-bottom:none}
+.pochette{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;flex:none;color:#fff}
+.nom{flex:1;min-width:0}
+.nom b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nom span{color:var(--discret);font-size:14px}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+#etat{min-height:22px;color:var(--turquoise);margin-top:12px}
+.erreur{color:var(--erreur)!important}
+.vide{color:var(--discret);padding:10px 6px}
+.filtres{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.filtres button{padding:7px 16px;font-size:14px}
+.filtres button.actif{background:linear-gradient(135deg,var(--or-clair),var(--or-fonce));color:#14121F;border:none}
+footer{color:var(--discret);font-size:13px;text-align:center;margin-top:28px;opacity:.8}
+</style>
+</head>
+<body>
+<main>
+  <div class="surtitre">PIANO ORCHESTRA</div>
+  <h1 id="nom-tablette">La tablette</h1>
+  <p class="sous">Échange de morceaux entre la tablette et cet ordinateur, sans internet.</p>
+
+  <section id="ecran-code" class="verre bloc" hidden>
+    <p class="titre-bloc">CODE D'ACCÈS</p>
+    <p>Tape le code à 4 chiffres affiché sur la tablette (écran « Échanger avec l'ordinateur »).</p>
+    <form id="form-code" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <input id="code" type="text" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="····">
+      <button class="principal" type="submit">Entrer</button>
+    </form>
+    <div id="etat-code" class="erreur" style="margin-top:10px"></div>
+  </section>
+
+  <div id="ecran-fichiers" hidden>
+    <section class="verre bloc">
+      <p class="titre-bloc">ENVOYER À LA TABLETTE</p>
+      <div id="zone"><strong>Dépose ici tes fichiers</strong>MIDI, Guitar Pro, MusicXML, PDF — ou
+        <label class="bouton" style="margin-left:6px">choisis-les<input id="choix" type="file" multiple hidden></label></div>
+      <div id="etat"></div>
+    </section>
+    <section class="verre bloc">
+      <p class="titre-bloc">LES MORCEAUX DE LA TABLETTE</p>
+      <div class="filtres" id="filtres"></div>
+      <div id="liste"><div class="vide">Chargement…</div></div>
+      <div class="actions">
+        <a class="bouton principal" id="sauvegarde" href="#">⬇ Tout sauvegarder (.zip)</a>
+        <button id="rafraichir">↻ Actualiser</button>
+      </div>
+    </section>
+  </div>
+  <footer>Piano Orchestra · la page reste sur ton réseau, rien ne part sur internet.</footer>
+</main>
+<script>
+(function () {
+  var code = '';
+  try { code = localStorage.getItem('po_code') || ''; } catch (e) {}
+  var filtre = 'tous';
+  var fichiers = [];
+  var COULEURS = { midi: ['#B9A6FF', '#6E54FF'], pdf: ['#FFB3CF', '#D9578A'], guitarpro: ['#F3CC86', '#C98B36'],
+    musicxml: ['#8FF0E3', '#2E9C8F'], plan: ['#9CC3FF', '#3A6BD9'] };
+  var ICONES = { midi: '♪', pdf: '▤', guitarpro: '♫', musicxml: '𝄞', plan: '≡' };
+  var NOMS = { tous: 'Tous', midi: 'MIDI', guitarpro: 'Guitar Pro', musicxml: 'MusicXML', pdf: 'PDF', plan: 'Grilles' };
+  var $ = function (id) { return document.getElementById(id); };
+
+  function api(chemin, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    options.headers['X-PO-Code'] = code;
+    return fetch(chemin, options).then(function (r) {
+      if (r.status === 401) { montrerCode('Code incorrect.'); throw new Error('code'); }
+      return r;
+    });
+  }
+  function montrerCode(msg) {
+    $('ecran-code').hidden = false;
+    $('ecran-fichiers').hidden = true;
+    $('etat-code').textContent = msg || '';
+    $('code').focus();
+  }
+  function taille(o) { return o > 1048576 ? (o / 1048576).toFixed(1) + ' Mo' : Math.max(1, Math.round(o / 1024)) + ' ko'; }
+  function date(ms) { var d = new Date(ms); return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); }
+  function echap(s) { return s.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function dessiner() {
+    var types = ['tous'];
+    fichiers.forEach(function (f) { if (types.indexOf(f.kind) < 0) types.push(f.kind); });
+    $('filtres').innerHTML = types.map(function (t) {
+      return '<button data-t="' + t + '" class="' + (t === filtre ? 'actif' : '') + '">' + (NOMS[t] || t) + '</button>';
+    }).join('');
+    var vus = fichiers.filter(function (f) { return filtre === 'tous' || f.kind === filtre; });
+    $('liste').innerHTML = vus.length ? vus.map(function (f) {
+      var c = COULEURS[f.kind] || COULEURS.midi;
+      var lien = '/api/files/' + encodeURIComponent(f.name) + '?code=' + encodeURIComponent(code);
+      return '<div class="ligne"><div class="pochette" style="background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')">' +
+        (ICONES[f.kind] || '♪') + '</div><div class="nom"><b>' + echap(f.name) + '</b><span>' + taille(f.size) + ' · ' +
+        date(f.modified) + '</span></div><a class="bouton" href="' + lien + '" download>⬇ Télécharger</a></div>';
+    }).join('') : '<div class="vide">Aucun morceau pour l\'instant.</div>';
+    $('sauvegarde').href = '/api/backup.zip?code=' + encodeURIComponent(code);
+  }
+  function charger() {
+    api('/api/info').then(function (r) { return r.json(); }).then(function (i) {
+      if (i.name) { $('nom-tablette').textContent = i.name; }
+      $('ecran-code').hidden = true;
+      $('ecran-fichiers').hidden = false;
+      return api('/api/files').then(function (r) { return r.json(); });
+    }).then(function (l) { fichiers = l; dessiner(); }).catch(function () {});
+  }
+  function envoyer(liste) {
+    var a = Array.prototype.slice.call(liste);
+    var faits = 0, refus = 0;
+    var suivant = function () {
+      if (!a.length) {
+        $('etat').className = refus ? 'erreur' : '';
+        $('etat').textContent = faits + ' fichier(s) envoyé(s) à la tablette' + (refus ? ', ' + refus + ' refusé(s) (type non pris en charge)' : '') + '.';
+        charger();
+        return;
+      }
+      var f = a.shift();
+      $('etat').className = '';
+      $('etat').textContent = 'Envoi de « ' + f.name + ' »…';
+      api('/api/files/' + encodeURIComponent(f.name) + '?replace=0', { method: 'PUT', body: f })
+        .then(function (r) { if (r.ok) faits++; else refus++; })
+        .catch(function () { refus++; })
+        .then(suivant);
+    };
+    suivant();
+  }
+
+  $('form-code').addEventListener('submit', function (e) {
+    e.preventDefault();
+    code = $('code').value.trim();
+    try { localStorage.setItem('po_code', code); } catch (err) {}
+    charger();
+  });
+  $('filtres').addEventListener('click', function (e) { var t = e.target.getAttribute('data-t'); if (t) { filtre = t; dessiner(); } });
+  $('rafraichir').addEventListener('click', charger);
+  $('choix').addEventListener('change', function (e) { envoyer(e.target.files); e.target.value = ''; });
+  var zone = $('zone');
+  ['dragenter', 'dragover'].forEach(function (n) { zone.addEventListener(n, function (e) { e.preventDefault(); zone.classList.add('survol'); }); });
+  ['dragleave', 'drop'].forEach(function (n) { zone.addEventListener(n, function (e) { e.preventDefault(); zone.classList.remove('survol'); }); });
+  zone.addEventListener('drop', function (e) { envoyer(e.dataTransfer.files); });
+
+  fetch('/api/hello').then(function (r) { return r.json(); }).then(function (i) { if (i.name) $('nom-tablette').textContent = i.name; }).catch(function () {});
+  if (code) charger(); else montrerCode();
+})();
+</script>
+</body>
+</html>

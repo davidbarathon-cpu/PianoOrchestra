@@ -173,7 +173,8 @@ private fun SongList(
     app: App, lang: String, refresh: Int, onBack: () -> Unit,
     onImport: () -> Unit, onOpen: (SongLibrary.Entry) -> Unit, onDeleted: () -> Unit, onCatalog: () -> Unit = {},
 ) {
-    val mine = remember(refresh) { app.library.imported() }
+    val arrived by app.libraryVersion.collectAsState()
+    val mine = remember(refresh, arrived) { app.library.imported() }
     val context = LocalContext.current
     var toDelete by remember { mutableStateOf<SongLibrary.Entry?>(null) }
     Column(Modifier.fillMaxSize()) {
