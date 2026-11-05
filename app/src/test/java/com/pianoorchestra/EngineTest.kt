@@ -165,6 +165,45 @@ class EngineTest {
         }
     }
 
+    @Test
+    fun composeWithTheBand() {
+        // Bermet compose : elle joue des accords, le groupe suit, tout est enregistré (MIDI + grille)
+        val synth = Synth(sf, 32000)
+        val band = com.pianoorchestra.band.Band()
+        synth.sequencer = band
+        band.setStyle("ballade")
+        val l = FloatArray(512); val r = FloatArray(512)
+        band.startRecording()
+        synth.render(l, r, 512)
+        val chords = listOf(listOf(48, 52, 55), listOf(45, 48, 52), listOf(41, 45, 48), listOf(43, 47, 50))
+        val barFrames = (32000 * 60.0 / 72 * 4).toInt()            // ballade : 72 BPM, 4 temps
+        for (chord in chords) {
+            for (x in chord) band.onLive(0x90, x, 80)
+            band.onLive(0x90, 72, 90)                                 // une note de mélodie à droite
+            var done = 0
+            while (done < barFrames) { synth.render(l, r, 512); done += 512 }
+            for (x in chord) band.onLive(0x80, x, 0)
+            band.onLive(0x80, 72, 0)
+        }
+        assertTrue(band.state.value.recording)
+        val latch = java.util.concurrent.CountDownLatch(1)
+        var result: com.pianoorchestra.band.Band.Composition? = null
+        band.stopRecording { result = it; latch.countDown() }
+        synth.render(l, r, 512)
+        assertTrue(latch.await(5, java.util.concurrent.TimeUnit.SECONDS))
+        val comp = result ?: error("rien enregistré")
+        val song = Song.parse(comp.midi, "Composition")
+        song.attachPlan(comp.planJson)
+        println("composition : ${comp.bars} mesures, pistes ${song.parts.map { it.name }}, accords ${song.chords.map { it.name }}, ${song.bpm} BPM")
+        assertTrue(song.parts.any { it.name.startsWith("Bermet") && it.noteCount >= 12 })
+        assertTrue(song.parts.any { it.isDrums && it.noteCount > 10 })
+        assertTrue(song.parts.size >= 4)
+        assertEquals(72, song.bpm)
+        assertTrue("4 mesures environ", comp.bars in 4..5)
+        assertEquals(listOf("C", "Am", "F", "G"), song.chords.map { it.name }.take(4))
+        File("build/test-wav").apply { mkdirs() }.resolve("composition.mid").writeBytes(comp.midi)
+    }
+
     private fun writeWav(f: File, pcm: ShortArray, rate: Int) {
         DataOutputStream(FileOutputStream(f).buffered()).use { o ->
             fun le32(v: Int) { o.write(v and 0xFF); o.write((v shr 8) and 0xFF); o.write((v shr 16) and 0xFF); o.write((v shr 24) and 0xFF) }

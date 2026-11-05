@@ -296,6 +296,7 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit, o
     var seeking by remember { mutableStateOf<Float?>(null) }
     var tempoDrag by remember { mutableStateOf<Float?>(null) }
     var loopA by remember(song) { mutableStateOf(-1.0) }
+    var falling by rememberSaveable { mutableStateOf(app.demoFalling) }
 
     // une prise vient d'être enregistrée : on l'annonce
     val saved by app.lastSaved.collectAsState()
@@ -317,7 +318,8 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit, o
                 Spacer(Modifier.width(8.dp))
             }
         }
-        BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 20.dp)) {
+        if (falling) FallingView(app, lang, song, userPart, state, Modifier.weight(1f).fillMaxWidth()) { falling = false }
+        else BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 20.dp)) {
             val wide = maxWidth > 760.dp
             val controls: @Composable (Modifier) -> Unit = { m ->
                 Column(m, verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -405,6 +407,7 @@ private fun PlayerView(app: App, lang: String, song: Song, onBack: () -> Unit, o
                             SwitchRow(stringResource(R.string.wait_mode), stringResource(R.string.wait_mode_sub), waitMode || state.following) { waitMode = it; app.player.setWaitMode(it); if (!it) app.player.setFollow(false) }
                             SwitchRow(stringResource(R.string.follow), stringResource(R.string.follow_sub), state.following) { app.player.setFollow(it); if (it) waitMode = true }
                             SwitchRow(stringResource(R.string.progressive), stringResource(R.string.progressive_sub), progressive) { progressive = it; app.player.progressive = it }
+                            if (wide) SwitchRow(stringResource(R.string.falling_notes), stringResource(R.string.falling_notes_sub), falling) { falling = it }
                             Text(stringResource(R.string.loop), color = Po.Text, fontSize = 20.sp, modifier = Modifier.padding(top = 6.dp))
                             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Chip(stringResource(R.string.loop_a), selected = loopA >= 0 && !state.looping) {

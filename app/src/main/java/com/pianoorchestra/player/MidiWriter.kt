@@ -15,9 +15,11 @@ object MidiWriter {
     class Track(val name: String, val channel: Int, val program: Int, val events: List<Event>)
 
     private const val TPQ = 480
-    private const val BPM = 120.0
 
-    fun write(tracks: List<Track>, title: String): ByteArray {
+    /** [bpm] et [beatsPerBar] : pour que les mesures tombent juste (compositions avec le groupe). */
+    fun write(tracks: List<Track>, title: String, bpm: Double = 120.0, beatsPerBar: Int = 4): ByteArray {
+        val BPM = bpm.coerceIn(20.0, 300.0)
+        val usPerBeat = (60_000_000.0 / BPM).toInt()
         val out = ByteArrayOutputStream()
         out.write("MThd".toByteArray())
         be32(out, 6); be16(out, 1); be16(out, tracks.size + 1); be16(out, TPQ)
@@ -25,8 +27,8 @@ object MidiWriter {
         // piste de conduite : titre et tempo
         val conductor = ByteArrayOutputStream()
         meta(conductor, 0, 0x03, title.toByteArray(Charsets.UTF_8))
-        meta(conductor, 0, 0x51, byteArrayOf(0x07, 0xA1.toByte(), 0x20))       // 500 000 µs = 120 BPM
-        meta(conductor, 0, 0x58, byteArrayOf(4, 2, 24, 8))
+        meta(conductor, 0, 0x51, byteArrayOf((usPerBeat shr 16).toByte(), (usPerBeat shr 8).toByte(), usPerBeat.toByte()))
+        meta(conductor, 0, 0x58, byteArrayOf(beatsPerBar.coerceIn(1, 16).toByte(), 2, 24, 8))
         meta(conductor, 0, 0x2F, ByteArray(0))
         chunk(out, conductor.toByteArray())
 

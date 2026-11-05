@@ -232,4 +232,11 @@
     <string name="exchange_backup">Sauvegarde complète envoyée</string>
     <string name="exchange_refused">Refusé (type de fichier)</string>
     <string name="exchange_connected">Ordinateur connecté</string>
+    <string name="compose">Composer</string>
+    <string name="composition_prefix">Ma composition</string>
+    <string name="composition_saved">Composition gardée dans « Mes morceaux » : %1$s. Elle peut partir dans Riffmaker par l’écran « Échanger avec l’ordinateur ».</string>
+    <string name="falling_notes">Notes qui tombent</string>
+    <string name="falling_notes_sub">Les notes de ta partie descendent vers les touches à jouer.</string>
+    <string name="falling_close">Revenir aux réglages</string>
+    <string name="falling_waiting">J’attends ta note…</string>
 </resources>

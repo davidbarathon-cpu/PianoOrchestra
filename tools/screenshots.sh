@@ -33,6 +33,10 @@ for lang in fr ru; do
   WAIT=12 shot "tablette-${lang}-7-jeu-libre" --es po_lang $lang --es po_screen freeplay --es po_chord 45,48,52
 done
 
+# les notes qui tombent, pendant la lecture
+WAIT=16 shot "tablette-fr-14-notes-qui-tombent" --es po_lang fr --ei po_song 0 --ez po_autoplay true --ez po_falling true
+# composer : le jeu libre avec l'enregistrement (capture de l'écran seulement)
+
 # les deux autres ambiances (Bermet choisit dans les réglages)
 WAIT=10 shot "tablette-fr-9-aurore-accueil" --es po_lang fr --es po_screen home --es po_ambiance aurore
 WAIT=12 shot "tablette-fr-10-aurore-jeu-libre" --es po_lang fr --es po_screen freeplay --es po_chord 48,52,55

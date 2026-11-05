@@ -225,4 +225,11 @@
     <string name="exchange_backup">Полная копия отправлена</string>
     <string name="exchange_refused">Отклонено (тип файла)</string>
     <string name="exchange_connected">Компьютер подключён</string>
+    <string name="compose">Сочинять</string>
+    <string name="composition_prefix">Моя композиция</string>
+    <string name="composition_saved">Композиция сохранена в «Моих пьесах»: %1$s. Её можно отправить в Riffmaker через «Обмен с компьютером».</string>
+    <string name="falling_notes">Падающие ноты</string>
+    <string name="falling_notes_sub">Ноты твоей партии опускаются к клавишам, которые нужно нажать.</string>
+    <string name="falling_close">Вернуться к настройкам</string>
+    <string name="falling_waiting">Жду твою ноту…</string>
 </resources>

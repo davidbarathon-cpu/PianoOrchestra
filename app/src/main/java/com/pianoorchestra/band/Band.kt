@@ -27,6 +27,10 @@ class Band : Sequencer {
         val parts: Set<PartKind> = PartKind.entries.toSet(),
         val leftHandOnly: Boolean = true,
         val ending: Boolean = false,
+        /** Une composition est en cours d'enregistrement (Bermet + le groupe). */
+        val recording: Boolean = false,
+        /** Durée de la prise en secondes. */
+        val recordSeconds: Int = 0,
     )
 
     private val _state = MutableStateFlow(State())
@@ -62,6 +66,75 @@ class Band : Sequencer {
     private var arpIndex = 0
     private var lastPublishStep = -1
 
+    // --- la composition en cours d'enregistrement (fil audio)
+    private class Take(val bpm: Int, val beats: Int, val styleName: String, val programs: Map<Int, Int>) {
+        val events = HashMap<Int, ArrayList<com.pianoorchestra.player.MidiWriter.Event>>()
+        val chords = ArrayList<Pair<Double, String>>()
+        var t0 = -1.0
+    }
+    private var take: Take? = null
+    private var eventTime = 0.0
+
+    /** Ce qui sort du groupe passe par ici : joué, et noté si on enregistre. */
+    private fun out(synth: Synth, status: Int, d1: Int, d2: Int) {
+        synth.handle(status, d1, d2)
+        take?.let { t ->
+            t.events.getOrPut(status and 0x0F) { ArrayList() }.add(com.pianoorchestra.player.MidiWriter.Event(eventTime, status, d1, d2))
+        }
+    }
+
+    /** Une composition finie : le MIDI (une piste par musicien) et sa grille d'accords pour l'app et Riffmaker. */
+    class Composition(val midi: ByteArray, val planJson: String, val bars: Int)
+
+    /** Commence à enregistrer : Bermet et tout le groupe, calés sur les mesures. */
+    fun startRecording() = post {
+        val t = Take(bpm, style.beats, style.id, mapOf(
+            0 to 0, BASS_CH to style.bassProgram, COMP_CH to style.compProgram,
+            PAD_CH to (if (style.padProgram >= 0) style.padProgram else 89)))
+        if (running) {
+            val stepDur = 60.0 / bpm / 4
+            t.t0 = stepStart - (step % style.steps) * stepDur        // le début de la mesure en cours
+            chord?.let { c -> t.chords.add(clock to c.name) }
+        }
+        take = t
+        publish()
+    }
+
+    /** Arrête l'enregistrement ; [done] reçoit la composition (ou null si rien n'a été joué), hors du fil audio. */
+    fun stopRecording(done: (Composition?) -> Unit) = post {
+        val t = take
+        take = null
+        publish()
+        Thread { done(t?.let { build(it) }) }.start()
+    }
+
+    private fun build(t: Take): Composition? {
+        if (t.events.values.none { l -> l.any { (it.status and 0xF0) == 0x90 } }) return null
+        val t0 = if (t.t0 >= 0) t.t0 else t.events.values.flatten().minOf { it.time }
+        val end = t.events.values.flatten().maxOf { it.time } - t0
+        val names = mapOf(0 to "Bermet (piano)", 9 to "Batterie", BASS_CH to "Basse", COMP_CH to "Accompagnement", PAD_CH to "Nappe")
+        val tracks = listOf(0, 9, BASS_CH, COMP_CH, PAD_CH).mapNotNull { ch ->
+            val ev = t.events[ch] ?: return@mapNotNull null
+            if (ev.none { (it.status and 0xF0) == 0x90 }) return@mapNotNull null
+            com.pianoorchestra.player.MidiWriter.Track(names[ch] ?: "Piste", ch, t.programs[ch] ?: 0,
+                ev.map { com.pianoorchestra.player.MidiWriter.Event(it.time - t0, it.status, it.d1, it.d2) })
+        }
+        val midi = com.pianoorchestra.player.MidiWriter.write(tracks, "Composition", t.bpm.toDouble(), t.beats)
+        // la grille : l'accord au début (et au milieu) de chaque mesure
+        val barDur = 60.0 / t.bpm * t.beats
+        val bars = maxOf(1, kotlin.math.ceil((end - 0.05) / barDur).toInt())
+        fun chordAt(time: Double): String? = t.chords.lastOrNull { it.first - t0 <= time + 0.08 }?.second ?: t.chords.firstOrNull()?.second
+        val grid = (0 until bars).map { b ->
+            val a = chordAt(b * barDur)
+            val m = chordAt(b * barDur + barDur / 2)
+            when { a == null -> ""; m != null && m != a -> "$a $m"; else -> a }
+        }
+        val plan = "{\"titre\":\"Composition\",\"tempo\":${t.bpm},\"style\":\"${t.styleName}\",\"source\":\"Piano Orchestra\"," +
+            "\"sections\":[{\"type\":\"couplet\",\"mesures\":$bars,\"accords\":[" +
+            grid.joinToString(",") { "\"" + it.replace("\"", "") + "\"" } + "]}]}"
+        return Composition(midi, plan, bars)
+    }
+
     /** Appelé quand le groupe démarre (pour arrêter le lecteur de morceaux). */
     @Volatile var onStart: (() -> Unit)? = null
 
@@ -88,7 +161,7 @@ class Band : Sequencer {
     fun onLive(status: Int, d1: Int, d2: Int) {
         if ((status and 0x0F) == 9) return
         val kind = status and 0xF0
-        if (kind == 0x90 || kind == 0x80) live.add(intArrayOf(status, d1, d2))
+        if (kind == 0x90 || kind == 0x80 || (kind == 0xB0 && d1 == 64)) live.add(intArrayOf(status, d1, d2))
     }
 
     private fun post(cmd: (Synth) -> Unit) { commands.add(cmd) }
@@ -99,8 +172,13 @@ class Band : Sequencer {
             c(synth)
         }
         var noteOn = false
+        eventTime = clock
         while (true) {
             val m = live.poll() ?: break
+            take?.let { t ->      // ce que joue Bermet : piste 1, son de piano
+                t.events.getOrPut(0) { ArrayList() }.add(com.pianoorchestra.player.MidiWriter.Event(clock, (m[0] and 0xF0), m[1], m[2]))
+            }
+            if ((m[0] and 0xF0) == 0xB0) continue
             val on = (m[0] and 0xF0) == 0x90 && m[2] > 0
             held[m[1]] = on
             if (on && (!leftHandOnly || m[1] < split)) noteOn = true
@@ -111,6 +189,7 @@ class Band : Sequencer {
             if (c != null && c != chord) {
                 chord = c
                 chordChanged = true
+                take?.chords?.add(clock to c.name)
                 publish()
             }
             if (!running && armed && c != null) startNow(synth)
@@ -136,7 +215,7 @@ class Band : Sequencer {
             val it = offs.iterator()
             while (it.hasNext()) {
                 val o = it.next()
-                if (o.time < tEnd) { synth.handle(0x80 or o.channel, o.note, 0); it.remove() }
+                if (o.time < tEnd) { eventTime = o.time; out(synth, 0x80 or o.channel, o.note, 0); it.remove() }
             }
         }
         clock = tEnd
@@ -144,6 +223,7 @@ class Band : Sequencer {
     }
 
     private fun doStep(synth: Synth, time: Double) {
+        eventTime = time
         val c = chord ?: Chord(0, intArrayOf(0, 4, 7), "")
         val n = style.steps
         val s = step % n
@@ -235,43 +315,44 @@ class Band : Sequencer {
         releasePad(synth)
         val c = chord ?: return
         for (v in voicing(c, 60)) {
-            synth.handle(0x90 or PAD_CH, v, 62)
+            out(synth, 0x90 or PAD_CH, v, 62)
             padNotes.add(v)
         }
     }
 
     private fun releasePad(synth: Synth) {
-        for (v in padNotes) synth.handle(0x80 or PAD_CH, v, 0)
+        for (v in padNotes) out(synth, 0x80 or PAD_CH, v, 0)
         padNotes.clear()
     }
 
     private fun hit(synth: Synth, ch: Int, n: Int, vel: Int, len: Double) {
-        synth.handle(0x90 or ch, n, vel.coerceIn(1, 127))
+        out(synth, 0x90 or ch, n, vel.coerceIn(1, 127))
         offs.add(Off(clock + len, ch, n))
     }
 
     private fun note(synth: Synth, ch: Int, n: Int, vel: Int, time: Double, len: Double) {
-        synth.handle(0x90 or ch, n, vel)
+        out(synth, 0x90 or ch, n, vel)
         offs.add(Off(time + len, ch, n))
     }
 
     private fun setupPrograms(synth: Synth) {
-        synth.handle(0xC0 or BASS_CH, style.bassProgram, 0)
-        synth.handle(0xC0 or COMP_CH, style.compProgram, 0)
-        if (style.padProgram >= 0) synth.handle(0xC0 or PAD_CH, style.padProgram, 0)
-        synth.handle(0xB0 or 9, 7, 100)
-        synth.handle(0xB0 or BASS_CH, 7, 108)
-        synth.handle(0xB0 or COMP_CH, 7, if (style.compMode == Style.CompMode.POWER) 80 else 92)
-        synth.handle(0xB0 or PAD_CH, 7, 66)
+        out(synth, 0xC0 or BASS_CH, style.bassProgram, 0)
+        out(synth, 0xC0 or COMP_CH, style.compProgram, 0)
+        if (style.padProgram >= 0) out(synth, 0xC0 or PAD_CH, style.padProgram, 0)
+        out(synth, 0xB0 or 9, 7, 100)
+        out(synth, 0xB0 or BASS_CH, 7, 108)
+        out(synth, 0xB0 or COMP_CH, 7, if (style.compMode == Style.CompMode.POWER) 80 else 92)
+        out(synth, 0xB0 or PAD_CH, 7, 66)
         for (ch in intArrayOf(9, BASS_CH, COMP_CH, PAD_CH)) {
-            synth.handle(0xB0 or ch, 11, 127)
-            synth.handle(0xB0 or ch, 10, 64)
+            out(synth, 0xB0 or ch, 11, 127)
+            out(synth, 0xB0 or ch, 10, 64)
             synth.channelMix[ch] = 1f
         }
     }
 
     private fun startNow(synth: Synth) {
         onStart?.let { cb -> Thread { cb() }.start() }
+        eventTime = clock
         setupPrograms(synth)
         running = true
         step = 0
@@ -284,15 +365,16 @@ class Band : Sequencer {
         arpIndex = 0
         if (chord == null) chord = Chord(0, intArrayOf(0, 4, 7), "")
         chordChanged = true
+        take?.let { t -> if (t.t0 < 0) t.t0 = stepStart; if (t.chords.isEmpty()) chord?.let { t.chords.add(stepStart to it.name) } }
         publish()
     }
 
     private fun stopNow(synth: Synth) {
         running = false
         releasePad(synth)
-        for (o in offs) synth.handle(0x80 or o.channel, o.note, 0)
+        for (o in offs) out(synth, 0x80 or o.channel, o.note, 0)
         offs.clear()
-        for (ch in intArrayOf(BASS_CH, COMP_CH, PAD_CH)) synth.handle(0xB0 or ch, 123, 0)
+        for (ch in intArrayOf(BASS_CH, COMP_CH, PAD_CH)) out(synth, 0xB0 or ch, 123, 0)
         endingBar = -1
         publish()
     }
@@ -304,6 +386,8 @@ class Band : Sequencer {
             variation = if (pendingVariation >= 0) pendingVariation else variation, bpm = bpm,
             beat = (step % n) / 4, bar = step / n, parts = parts.toSet(), leftHandOnly = leftHandOnly,
             ending = endingRequested || endingBar >= 0,
+            recording = take != null,
+            recordSeconds = take?.let { t -> if (t.t0 >= 0) (clock - t.t0).coerceAtLeast(0.0).toInt() else 0 } ?: 0,
         )
     }
 

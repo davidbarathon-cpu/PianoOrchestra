@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -67,6 +68,14 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
     val names = stringArrayResource(R.array.note_names)
     var tempoDrag by remember { mutableStateOf<Float?>(null) }
     val style = Style.byId(st.style)
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val saved by app.lastSaved.collectAsState()
+    androidx.compose.runtime.LaunchedEffect(saved) {
+        saved?.let {
+            android.widget.Toast.makeText(context, context.getString(R.string.composition_saved, it), android.widget.Toast.LENGTH_LONG).show()
+            app.lastSaved.value = null
+        }
+    }
 
     Column(Modifier.fillMaxSize()) {
         TopBar(stringResource(R.string.menu_freeplay), { app.band.stop(); onBack() })
@@ -78,7 +87,7 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
                         modifier = Modifier.fillMaxSize()) {
                         // l'accord, en très grand, dans un anneau de lumière
                         val accent = Po.Gold
-                        Box(Modifier.size(250.dp), contentAlignment = Alignment.Center) {
+                        Box(Modifier.size(220.dp), contentAlignment = Alignment.Center) {
                             Canvas(Modifier.fillMaxSize()) {
                                 val r = size.minDimension / 2f
                                 drawCircle(Brush.radialGradient(listOf(accent.copy(alpha = 0.22f), Color.Transparent)), r)
@@ -87,7 +96,7 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
                             }
                             Text(
                                 st.chord?.let { MusicText.chord(it, lang) } ?: "—",
-                                fontSize = 92.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
+                                fontSize = 84.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center,
                                 style = TextStyle(brush = Brush.verticalGradient(listOf(Color(0xFFFFF4DE), Po.GoldSoft, Po.ambiance.accentDeep)),
                                     shadow = Shadow(accent.copy(alpha = 0.45f), blurRadius = 40f))
                             )
@@ -100,8 +109,7 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
                                     if (st.running && st.beat == b) (if (b == 0) Po.Gold else Po.Teal) else Color.White.copy(alpha = 0.16f)))
                             }
                         }
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Box(
+                        Box(
                                 Modifier.size(96.dp).clip(CircleShape).background(if (st.running) Po.tealBrush else Po.accentBrush)
                                     .clickable { app.band.startStop() },
                                 contentAlignment = Alignment.Center
@@ -110,8 +118,11 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
                                     stringResource(if (st.running) R.string.stop else R.string.start),
                                     tint = Po.Night, modifier = Modifier.size(60.dp))
                             }
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             BigButton("${stringResource(R.string.variation)} ${if (st.variation == 0) "A" else "B"}", null) { app.band.variation() }
                             BigButton(stringResource(R.string.ending), if (st.ending) Po.Danger else null) { app.band.ending() }
+                            RecordButton(st.recording, st.recordSeconds) { app.toggleComposition() }
                         }
                     }
                 }
@@ -169,6 +180,23 @@ fun FreePlayScreen(app: App, lang: String, onBack: () -> Unit) {
         Spacer(Modifier.height(12.dp))
         PianoKeyboard(live = keys, noteNames = names,
             onNoteOn = { app.screenNoteOn(it) }, onNoteOff = { app.screenNoteOff(it) })
+    }
+}
+
+/** Composer : enregistre Bermet et le groupe ; le morceau va dans « Mes morceaux » (et peut partir dans Riffmaker). */
+@Composable
+private fun RecordButton(recording: Boolean, seconds: Int, onClick: () -> Unit) {
+    Row(
+        (if (recording) Modifier.clip(RoundedCornerShape(22.dp)).background(Po.Danger.copy(alpha = 0.85f))
+         else Modifier.glass(RoundedCornerShape(22.dp)))
+            .clickable(onClick = onClick).padding(horizontal = 20.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(Modifier.size(if (recording) 14.dp else 16.dp).clip(if (recording) RoundedCornerShape(3.dp) else CircleShape)
+            .background(if (recording) Color.White else Po.Danger))
+        Spacer(Modifier.width(10.dp))
+        Text(if (recording) "%d:%02d".format(seconds / 60, seconds % 60) else stringResource(R.string.compose),
+            color = Po.Text, fontSize = 20.sp, fontWeight = FontWeight.Medium)
     }
 }
 

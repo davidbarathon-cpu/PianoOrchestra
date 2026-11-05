@@ -55,6 +55,7 @@ class MainActivity : ComponentActivity() {
         val startScreen = intent.getStringExtra("po_screen")?.let { s -> Screen.entries.firstOrNull { it.name.equals(s, true) } }
         val autoSong = intent.getIntExtra("po_song", -1)
         val autoPlay = intent.getBooleanExtra("po_autoplay", false)
+        app.demoFalling = intent.getBooleanExtra("po_falling", false)
         // captures : un accord tenu sur le clavier à l'écran pour montrer le jeu libre
         intent.getStringExtra("po_chord")?.let { c ->
             val notes = c.split(',').mapNotNull { it.trim().toIntOrNull() }

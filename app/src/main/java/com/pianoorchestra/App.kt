@@ -204,6 +204,8 @@ class App : Application() {
 
     /** Le dernier enregistrement gardé (pour l'annoncer à l'écran). */
     val lastSaved = MutableStateFlow<String?>(null)
+    /** Captures d'écran automatiques : ouvrir le lecteur directement en « notes qui tombent ». */
+    var demoFalling = false
 
     // ------------------------------------------------------------------ échange avec l'ordinateur
     data class ExchangeLog(val kind: com.pianoorchestra.exchange.ExchangeServer.Kind, val name: String, val from: String, val time: Long)
@@ -252,6 +254,19 @@ class App : Application() {
             val bytes = recorder.stop() ?: return
             saveTake(bytes, getString(R.string.take_free))
         } else recorder.start()
+    }
+
+    /** Jeu libre : enregistrer une composition (Bermet + le groupe), puis la garder avec sa grille d'accords. */
+    fun toggleComposition() {
+        if (band.state.value.recording) {
+            band.stopRecording { comp ->
+                if (comp == null) return@stopRecording
+                val name = library.saveRecording(comp.midi, getString(R.string.composition_prefix))
+                runCatching { java.io.File(library.songsDir, "$name.plan.json").writeText(comp.planJson) }
+                libraryVersion.value++
+                lastSaved.value = name
+            }
+        } else band.startRecording()
     }
 
     /** Le clavier à l'écran joue sur la tablette. */
