@@ -37,6 +37,30 @@ done
 WAIT=16 shot "tablette-fr-14-notes-qui-tombent" --es po_lang fr --ei po_song 0 --ez po_autoplay true --ez po_falling true
 # composer : le jeu libre avec l'enregistrement (capture de l'écran seulement)
 
+# une chanson de répétition, envoyée par l'échange wifi comme le fait Riffmaker (son + partition + carnet)
+adb shell am start -S -W -n $PKG/.MainActivity --es po_lang fr --es po_screen exchange --es po_code 4821 > /dev/null
+sleep 8
+adb forward tcp:18765 tcp:8765
+python3 - <<'PY'
+import math, struct, wave
+with wave.open("shots_demo.wav", "wb") as w:            # 40 s : un accord par mesure à 96 BPM
+    w.setnchannels(1); w.setsampwidth(2); w.setframerate(22050)
+    frames = bytearray()
+    for i in range(22050 * 40):
+        t = i / 22050
+        f = (220, 196, 247, 165)[int(t / 2.5) % 4]
+        frames += struct.pack("<h", int(6000 * math.sin(2 * math.pi * f * t) * math.exp(-(t % 2.5) * 1.5)))
+    w.writeframes(bytes(frames))
+PY
+T="Balade%20acoustique%20(r%C3%A9p%C3%A9tition)"
+for f in "shots_demo.wav:$T.wav" "app/src/main/assets/songs/03_acoustique.gp5:$T.gp5" "tools/demo/Balade acoustique (répétition).carnet.json:$T.carnet.json"; do
+  src="${f%%:*}"; dst="${f#*:}"
+  curl -s -X PUT -H "X-PO-Code: 4821" --data-binary "@$src" "http://127.0.0.1:18765/api/files/$dst"; echo
+done
+WAIT=10 shot "tablette-fr-15-repetition" --es po_lang fr --ei po_carnet 0
+WAIT=10 shot "tablette-ru-15-repetition" --es po_lang ru --ei po_carnet 0
+WAIT=8 shot "tablette-fr-16-morceaux-avec-repetition" --es po_lang fr --es po_screen playalong
+
 # les deux autres ambiances (Bermet choisit dans les réglages)
 WAIT=10 shot "tablette-fr-9-aurore-accueil" --es po_lang fr --es po_screen home --es po_ambiance aurore
 WAIT=12 shot "tablette-fr-10-aurore-jeu-libre" --es po_lang fr --es po_screen freeplay --es po_chord 48,52,55

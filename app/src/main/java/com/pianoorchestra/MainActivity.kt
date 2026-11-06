@@ -56,6 +56,9 @@ class MainActivity : ComponentActivity() {
         val autoSong = intent.getIntExtra("po_song", -1)
         val autoPlay = intent.getBooleanExtra("po_autoplay", false)
         app.demoFalling = intent.getBooleanExtra("po_falling", false)
+        intent.getStringExtra("po_code")?.let { app.prefs.exchangeCode = it }          // captures : code connu
+        val demoCarnet = intent.getIntExtra("po_carnet", -1).takeIf { it >= 0 }
+            ?.let { i -> app.library.carnets().getOrNull(i)?.id }
         // captures : un accord tenu sur le clavier à l'écran pour montrer le jeu libre
         intent.getStringExtra("po_chord")?.let { c ->
             val notes = c.split(',').mapNotNull { it.trim().toIntOrNull() }
@@ -71,9 +74,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PoTheme {
-                var screen by rememberSaveable { mutableStateOf(startScreen ?: (if (autoSong >= 0) Screen.PLAYALONG else Screen.HOME)) }
+                var screen by rememberSaveable { mutableStateOf(startScreen ?: (if (autoSong >= 0 || demoCarnet != null) Screen.PLAYALONG else Screen.HOME)) }
                 val lang = app.prefs.lang
-                var resumeId by rememberSaveable { mutableStateOf<String?>(null) }
+                var resumeId by rememberSaveable { mutableStateOf(demoCarnet) }
                 var catalogBack by rememberSaveable { mutableStateOf(Screen.PLAYALONG) }
                 Box(Modifier.fillMaxSize().systemBarsPadding()) {
                     BackHandler(enabled = screen != Screen.HOME) { screen = if (screen == Screen.CATALOG) catalogBack else Screen.HOME }

@@ -239,4 +239,21 @@
     <string name="falling_notes_sub">Les notes de ta partie descendent vers les touches à jouer.</string>
     <string name="falling_close">Revenir aux réglages</string>
     <string name="falling_waiting">J’attends ta note…</string>
+    <string name="songs_rehearsal">Répétitions avec le groupe</string>
+    <string name="carnet_unreadable">Ce carnet ne se lit pas : renvoie la chanson depuis Riffmaker.</string>
+    <string name="carnet_score">Partition</string>
+    <string name="carnet_rehearsal">Répétition</string>
+    <string name="carnet_concert">Concert</string>
+    <string name="carnet_countin">Décompte…</string>
+    <string name="carnet_bar_of">Mesure %1$d sur %2$d</string>
+    <string name="carnet_next">Ensuite : %1$s</string>
+    <string name="carnet_bars">%1$d mes.</string>
+    <string name="carnet_no_audio">Le son du groupe n’a pas été envoyé avec cette chanson. Le carnet se lit tel quel ; la partition (en haut) joue le morceau avec la tablette.</string>
+    <string name="carnet_audio_missing">Le son du groupe n’est pas encore sur la tablette : renvoie la chanson depuis Riffmaker avec « le son du groupe ».</string>
+    <string name="carnet_part_again">Reprendre la partie</string>
+    <string name="carnet_speed">Vitesse (la hauteur ne change pas)</string>
+    <string name="carnet_loop">Boucler la partie</string>
+    <string name="carnet_loop_sub">Touche une partie du carnet pour la répéter en boucle.</string>
+    <string name="carnet_offset">Calage du carnet</string>
+    <string name="carnet_offset_sub">Si le carnet est en avance ou en retard sur le son.</string>
 </resources>

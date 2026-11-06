@@ -40,6 +40,9 @@ class Prefs(context: Context) {
     var lastSong: String?
         get() = sp.getString("last_song", null)
         set(v) { sp.edit().putString("last_song", v).apply() }
+    /** Calage du carnet sur le son du groupe, par chanson (secondes, + = le carnet attend). */
+    fun carnetOffset(id: String): Float = sp.getFloat("offset_$id", 0f)
+    fun setCarnetOffset(id: String, v: Float) { sp.edit().putFloat("offset_$id", v).apply() }
     var masterVolume: Float
         get() = sp.getFloat("master_volume", 0.7f)
         set(v) { sp.edit().putFloat("master_volume", v).apply() }

@@ -232,4 +232,21 @@
     <string name="falling_notes_sub">Ноты твоей партии опускаются к клавишам, которые нужно нажать.</string>
     <string name="falling_close">Вернуться к настройкам</string>
     <string name="falling_waiting">Жду твою ноту…</string>
+    <string name="songs_rehearsal">Репетиции с группой</string>
+    <string name="carnet_unreadable">Не удаётся прочитать этот блокнот: отправь песню из Riffmaker ещё раз.</string>
+    <string name="carnet_score">Ноты</string>
+    <string name="carnet_rehearsal">Репетиция</string>
+    <string name="carnet_concert">Концерт</string>
+    <string name="carnet_countin">Отсчёт…</string>
+    <string name="carnet_bar_of">Такт %1$d из %2$d</string>
+    <string name="carnet_next">Дальше: %1$s</string>
+    <string name="carnet_bars">%1$d т.</string>
+    <string name="carnet_no_audio">Звук группы не был отправлен с этой песней. Блокнот можно читать; ноты (вверху) играют песню на планшете.</string>
+    <string name="carnet_audio_missing">Звука группы ещё нет на планшете: отправь песню из Riffmaker вместе со звуком группы.</string>
+    <string name="carnet_part_again">Сначала части</string>
+    <string name="carnet_speed">Скорость (высота не меняется)</string>
+    <string name="carnet_loop">Повторять часть</string>
+    <string name="carnet_loop_sub">Нажми на часть в блокноте, чтобы повторять её по кругу.</string>
+    <string name="carnet_offset">Синхронизация блокнота</string>
+    <string name="carnet_offset_sub">Если блокнот спешит или отстаёт от звука.</string>
 </resources>

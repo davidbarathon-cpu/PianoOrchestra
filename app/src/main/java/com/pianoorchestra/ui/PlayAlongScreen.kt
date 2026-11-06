@@ -1,5 +1,6 @@
 package com.pianoorchestra.ui
 
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.ui.graphics.Color
@@ -110,7 +111,7 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     LaunchedEffect(opened) {
         val e = opened ?: return@LaunchedEffect
         app.prefs.lastSong = e.id
-        if (e.isScore || e.isPdf) return@LaunchedEffect           // la partition se charge dans son propre écran
+        if (e.isScore || e.isPdf || e.isCarnet) return@LaunchedEffect           // la partition se charge dans son propre écran
         val current = app.player.state.value
         if (current.playing && current.song?.name == e.title(lang)) return@LaunchedEffect   // déjà en cours (écran tourné)
         loading = true
@@ -137,6 +138,9 @@ fun PlayAlongScreen(app: App, lang: String, onBack: () -> Unit, autoOpen: Int = 
     if (entry == null) {
         SongList(app, lang, refresh, onBack, onImport = { importLauncher.launch(arrayOf("*/*")) }, onCatalog = onCatalog,
             onOpen = { openedId = it.id }, onDeleted = { refresh++ })
+    } else if (entry.isCarnet) {
+        BackHandler { openedId = null }
+        RehearsalView(app, lang, entry, onBack = { openedId = null }, onOpenScore = { openedId = it.id })
     } else if (entry.isPdf) {
         BackHandler { openedId = null }
         PdfView(app, lang, entry, onBack = { openedId = null })
@@ -175,6 +179,7 @@ private fun SongList(
 ) {
     val arrived by app.libraryVersion.collectAsState()
     val mine = remember(refresh, arrived) { app.library.imported() }
+    val rehearsals = remember(refresh, arrived) { app.library.carnets() }
     val context = LocalContext.current
     var toDelete by remember { mutableStateOf<SongLibrary.Entry?>(null) }
     Column(Modifier.fillMaxSize()) {
@@ -190,6 +195,10 @@ private fun SongList(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            if (rehearsals.isNotEmpty()) {
+                item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_rehearsal), Modifier.padding(top = 8.dp)) }
+                items(rehearsals, key = { it.id }) { e -> SongCard(e, lang, onClick = { onOpen(e) }, onDelete = { toDelete = e }) }
+            }
             item(span = { GridItemSpan(maxLineSpan) }) { CatalogBanner(onCatalog) }
             if (mine.isNotEmpty()) {
                 item(span = { GridItemSpan(maxLineSpan) }) { SectionTitle(stringResource(R.string.songs_mine), Modifier.padding(top = 8.dp)) }
@@ -257,6 +266,7 @@ private fun SongCard(e: SongLibrary.Entry, lang: String, onClick: () -> Unit, on
             contentAlignment = Alignment.Center
         ) {
             Icon(when {
+                e.isCarnet -> Icons.AutoMirrored.Rounded.MenuBook
                 e.isPdf -> Icons.Rounded.Description
                 e.isScore -> Icons.Rounded.LibraryMusic
                 else -> Icons.Rounded.MusicNote

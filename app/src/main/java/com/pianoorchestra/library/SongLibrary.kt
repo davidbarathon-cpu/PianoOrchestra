@@ -24,6 +24,8 @@ class SongLibrary(private val context: Context) {
         val builtIn: Boolean get() = asset != null
         /** Partition (Guitar Pro, MusicXML) plutôt que fichier MIDI. */
         val isPdf: Boolean get() = (asset ?: file?.name ?: "").lowercase().endsWith(".pdf")
+        /** Une chanson de répétition : son carnet (+ le son du groupe et la partition à côté). */
+        val isCarnet: Boolean get() = (file?.name ?: "").lowercase().endsWith(Carnet.SUFFIX)
         val isScore: Boolean get() = (asset ?: file?.name ?: "").substringAfterLast('.').lowercase() in SCORE_EXT
         fun title(lang: String) = if (lang == "ru") titleRu else titleFr
         fun style(lang: String) = if (lang == "ru") styleRu else styleFr
@@ -58,7 +60,26 @@ class SongLibrary(private val context: Context) {
                 Entry("file:" + f.name, name, name, kind, kind, file = f)
             }
 
-    fun all(): List<Entry> = imported() + builtIn + builtInScores
+    /** Les chansons de répétition envoyées par Riffmaker (un carnet chacune). */
+    fun carnets(): List<Entry> =
+        (dir.listFiles { f -> f.name.lowercase().endsWith(Carnet.SUFFIX) } ?: emptyArray())
+            .sortedBy { it.name.lowercase() }
+            .map { f ->
+                val c = runCatching { Carnet.parse(f.readText()) }.getOrNull()
+                val name = c?.title?.ifBlank { null } ?: f.name.dropLast(Carnet.SUFFIX.length)
+                val list = c?.list?.ifBlank { null } ?: "Répétition"
+                Entry("file:" + f.name, name, name, "$list · ${c?.sections?.size ?: 0} parties",
+                    "${if (list == "Concert") "Концерт" else "Репетиция"} · ${c?.sections?.size ?: 0} частей", file = f)
+            }
+
+    fun carnet(e: Entry): Carnet? = e.file?.let { runCatching { Carnet.parse(it.readText()) }.getOrNull() }
+
+    /** Un fichier rangé à côté du carnet (le son du groupe, la partition). */
+    fun sibling(name: String?): File? = name?.let { File(dir, it).takeIf { f -> f.isFile } }
+
+    fun entryFor(f: File?): Entry? = f?.let { file -> imported().firstOrNull { it.file == file } }
+
+    fun all(): List<Entry> = carnets() + imported() + builtIn + builtInScores
 
     /** Le contenu brut d'un morceau (pour la partition). */
     fun bytes(e: Entry): ByteArray = when {
@@ -124,7 +145,10 @@ class SongLibrary(private val context: Context) {
         return f.nameWithoutExtension
     }
 
-    fun delete(e: Entry) { e.file?.delete() }
+    fun delete(e: Entry) {
+        if (e.isCarnet) carnet(e)?.let { c -> sibling(c.audioFile)?.delete() }     // le son du groupe part avec
+        e.file?.delete()
+    }
 
     private fun displayName(uri: Uri): String? = try {
         context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { c ->

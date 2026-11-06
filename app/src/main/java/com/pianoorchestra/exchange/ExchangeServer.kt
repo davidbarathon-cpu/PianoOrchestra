@@ -291,6 +291,8 @@ class ExchangeServer(
             "mid", "midi", "kar" -> "audio/midi"
             "pdf" -> "application/pdf"
             "json" -> "application/json"
+            "wav" -> "audio/wav"
+            "mp3" -> "audio/mpeg"
             "xml", "musicxml" -> "application/vnd.recordare.musicxml+xml"
             "mxl" -> "application/vnd.recordare.musicxml"
             else -> "application/octet-stream"
@@ -369,17 +371,24 @@ class FolderStore(private val dir: File) : ExchangeServer.Store {
     }
 
     companion object {
-        val EXTENSIONS = setOf("mid", "midi", "kar", "gp", "gp3", "gp4", "gp5", "gpx", "xml", "musicxml", "mxl", "pdf")
+        val EXTENSIONS = setOf("mid", "midi", "kar", "gp", "gp3", "gp4", "gp5", "gpx", "xml", "musicxml", "mxl", "pdf",
+            "wav", "mp3", "m4a", "ogg", "flac")
 
         /** « Plan.json » : la grille d'accords de Riffmaker, rangée à côté de son MIDI. */
-        fun extension(name: String) = if (name.lowercase().endsWith(".plan.json")) "plan.json" else name.substringAfterLast('.', "").lowercase()
+        fun extension(name: String) = when {
+            name.lowercase().endsWith(".plan.json") -> "plan.json"
+            name.lowercase().endsWith(".carnet.json") -> "carnet.json"
+            else -> name.substringAfterLast('.', "").lowercase()
+        }
 
-        fun accepted(name: String) = extension(name) in EXTENSIONS || extension(name) == "plan.json"
+        fun accepted(name: String) = extension(name) in EXTENSIONS || extension(name) == "plan.json" || extension(name) == "carnet.json"
 
         fun kind(name: String) = when (extension(name)) {
             "mid", "midi", "kar" -> "midi"
             "pdf" -> "pdf"
             "plan.json" -> "plan"
+            "carnet.json" -> "carnet"
+            "wav", "mp3", "m4a", "ogg", "flac" -> "audio"
             "gp", "gp3", "gp4", "gp5", "gpx" -> "guitarpro"
             else -> "musicxml"
         }
