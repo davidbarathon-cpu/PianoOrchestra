@@ -40,13 +40,13 @@ class Prefs(context: Context) {
     var lastSong: String?
         get() = sp.getString("last_song", null)
         set(v) { sp.edit().putString("last_song", v).apply() }
-    /** Claude en ligne pour le compositeur : la clé (donnée par David, ou envoyée par Riffmaker) et le modèle. */
+    /** L'IA gratuite en ligne pour le compositeur (Mistral ou Groq) : la clé gratuite et « rapide » ou non. */
     var aiKey: String
         get() = sp.getString("ai_key", "") ?: ""
         set(v) { sp.edit().putString("ai_key", v.trim()).apply() }
-    var aiModel: String
-        get() = sp.getString("ai_model", com.pianoorchestra.compose.OnlineComposer.MODELS[0]) ?: com.pianoorchestra.compose.OnlineComposer.MODELS[0]
-        set(v) { sp.edit().putString("ai_model", v).apply() }
+    var aiFast: Boolean
+        get() = sp.getBoolean("ai_fast", false)
+        set(v) { sp.edit().putBoolean("ai_fast", v).apply() }
     var aiEnabled: Boolean
         get() = sp.getBoolean("ai_enabled", true)
         set(v) { sp.edit().putBoolean("ai_enabled", v).apply() }
@@ -251,11 +251,11 @@ class App : Application() {
 
     val aiReady: Boolean get() = prefs.aiEnabled && prefs.aiKey.isNotBlank()
 
-    /** Composer d'après une demande : Claude si possible, sinon le compositeur de la tablette. Hors du fil principal. */
+    /** Composer d'après une demande : l'IA en ligne si possible, sinon le compositeur de la tablette. Hors du fil principal. */
     fun compose(request: String, seed: Long = System.nanoTime()): Composed {
         if (aiReady) {
             try {
-                return Composed(com.pianoorchestra.compose.OnlineComposer.compose(request, prefs.aiKey, prefs.aiModel), null)
+                return Composed(com.pianoorchestra.compose.OnlineComposer.compose(request, prefs.aiKey, prefs.aiFast), null)
             } catch (e: com.pianoorchestra.compose.OnlineComposer.Failure) {
                 val offline = com.pianoorchestra.compose.Composer.compose(com.pianoorchestra.compose.Composer.read(request), seed)
                 return Composed(offline, e.message)
@@ -268,7 +268,7 @@ class App : Application() {
     fun modify(plan: com.pianoorchestra.compose.Plan, request: String): Composed? {
         if (aiReady) {
             try {
-                return Composed(com.pianoorchestra.compose.OnlineComposer.modify(plan, request, prefs.aiKey, prefs.aiModel), null)
+                return Composed(com.pianoorchestra.compose.OnlineComposer.modify(plan, request, prefs.aiKey, prefs.aiFast), null)
             } catch (e: com.pianoorchestra.compose.OnlineComposer.Failure) {
                 return com.pianoorchestra.compose.Composer.modify(plan, request)?.let { Composed(it, e.message) }
             }

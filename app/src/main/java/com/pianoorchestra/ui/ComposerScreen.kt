@@ -92,7 +92,7 @@ private fun partColor(type: String): Color = when (type) {
 }
 
 /**
- * Le compositeur : Bermet décrit un morceau (« une valse joyeuse en ré »), la tablette — ou Claude en ligne —
+ * Le compositeur : Bermet décrit un morceau (« une valse joyeuse en ré »), la tablette — ou l'IA gratuite en ligne —
  * l'écrit ; on l'écoute, on le change (« plus lent », « autre mélodie »…), puis on joue avec l'orchestre.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -228,7 +228,7 @@ fun ComposerScreen(app: App, lang: String, onBack: () -> Unit, onPlayAlong: (Str
                         Text(p.title, color = Po.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium, lineHeight = 36.sp)
                         val secs = render?.seconds ?: 0.0
                         Text("${composerStyle(p.style, lang)} · ${p.keyName(lang)} · ${p.tempo} BPM · ${MusicText.time(secs)} · " +
-                            stringResource(if (p.source == "Claude") R.string.composer_by_claude else R.string.composer_by_tablet),
+                            if (p.source == "tablette") stringResource(R.string.composer_by_tablet) else stringResource(R.string.composer_by_ai, p.source),
                             color = Po.Gold, fontSize = 16.sp)
                         note?.let { Text(stringResource(R.string.composer_fallback, it), color = Po.Muted, fontSize = 14.sp) }
                         // la structure : une pastille par partie, largeur selon ses mesures
@@ -258,7 +258,7 @@ fun ComposerScreen(app: App, lang: String, onBack: () -> Unit, onPlayAlong: (Str
                             }
                             GlassPill(stringResource(R.string.composer_play_along), Icons.Rounded.Piano) { playAlong() }
                             GlassPill(stringResource(R.string.composer_again), Icons.Rounded.Refresh) {
-                                if (p.source == "Claude" && app.aiReady) run { app.compose(p.request.substringBefore(" · ")) }
+                                if (p.source != "tablette" && app.aiReady) run { app.compose(p.request.substringBefore(" · ")) }
                                 else run { App.Composed(com.pianoorchestra.compose.Composer.compose(
                                     com.pianoorchestra.compose.Composer.read(p.request.substringBefore(" · ")), System.nanoTime()), null) }
                             }

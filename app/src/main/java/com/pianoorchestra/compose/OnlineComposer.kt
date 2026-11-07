@@ -5,32 +5,45 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Claude en ligne : il comprend n'importe quelle demande (en français ou en russe) et écrit le plan complet —
- * structure, accords riches, et la mélodie note par note. La tablette joue ensuite le morceau elle-même.
+ * L'IA en ligne, gratuite : Mistral (français, hébergé en Europe) ou Groq, avec une clé gratuite créée une fois.
+ * Elle comprend n'importe quelle demande (en français ou en russe) et écrit le plan complet — structure, accords
+ * riches, et la mélodie note par note. La tablette joue ensuite le morceau elle-même.
  * Sans clé ou sans internet, le compositeur de la tablette prend le relais.
  */
 object OnlineComposer {
 
     class Failure(message: String) : Exception(message)
 
-    const val URL_API = "https://api.anthropic.com/v1/messages"
-    val MODELS = listOf("claude-sonnet-5-5", "claude-haiku-5-5")
+    /** Un service gratuit : son adresse et ses modèles (le meilleur, puis le rapide / de secours). */
+    enum class Provider(val label: String, val url: String, val best: String, val fast: String, val maxTokens: Int) {
+        MISTRAL("Mistral", "https://api.mistral.ai/v1/chat/completions", "mistral-large-latest", "mistral-small-latest", 12000),
+        GROQ("Groq", "https://api.groq.com/openai/v1/chat/completions", "openai/gpt-oss-120b", "llama-3.3-70b-versatile", 6000),   // l'offre gratuite de Groq compte les jetons par minute
+    }
+
+    /** Le service se reconnaît à la clé : celles de Groq commencent par « gsk_ ». */
+    fun providerFor(key: String): Provider = if (key.trim().startsWith("gsk_")) Provider.GROQ else Provider.MISTRAL
 
     private val SYSTEM = """
 Tu es le compositeur de Piano Orchestra, l'application de piano de Bermet (pianiste ; elle parle français et russe).
 Elle décrit un morceau ; tu écris son plan complet, que la tablette jouera avec un petit groupe (batterie, basse,
-piano ou guitare d'accompagnement, nappe de cordes, mélodie). Réponds uniquement en appelant l'outil « ecrire_morceau ».
+piano ou guitare d'accompagnement, nappe de cordes, mélodie).
+Réponds UNIQUEMENT par un objet JSON, sans texte autour, de cette forme :
+{"titre":"…","style":"ballade","tempo":80,"tonique":9,"mineur":true,"son_melodie":73,
+ "sections":[{"type":"intro","nom":"Intro","mesures":4,"accords":["Am","F","C","G"],"energie":1,
+   "batterie":false,"basse":true,"accompagnement":true,"nappe":true,"melodie":false},
+  {"type":"couplet","nom":"Couplet 1","mesures":8,"accords":["Am","F","C","G","Am","F","E7","Am"],"energie":2,
+   "notes":[[0,0,1,69],[0,1,1,72],[0,2,2,76],[1,0,3,74]]}, …]}
 
 Règles :
 - style : un des six styles de la tablette — pop, ballade, rock, valse (3 temps), bossa, jazz (swing). Choisis le plus proche.
-- tempo en BPM (40 à 220), tonique 0 = do … 11 = si, mineur vrai/faux.
+- tempo en BPM (40 à 220), tonique 0 = do … 11 = si, mineur true/false.
 - sections dans l'ordre joué : type parmi intro, couplet, prerefrain, refrain, pont, solo, interlude, outro ; nom affiché
   (« Intro », « Couplet 1 », « Refrain 2 »… en français, ou en russe si la demande est en russe) ; mesures 2 à 16 ;
   le morceau complet fait 32 à 80 mesures, avec une intro et une fin.
 - accords : un par mesure, en notation anglaise (C, Am, F#m7, Bbmaj7, G/B, Dsus4) ; deux dans une mesure : « C G ».
   Des grilles musicales et chantantes, qui conviennent au style ; le refrain doit être différent du couplet ; la fin
   se pose sur la tonique.
-- energie : 1 calme, 2 normal, 3 fort ; batterie/basse/accompagnement/nappe/melodie : qui joue dans cette partie.
+- energie : 1 calme, 2 normal, 3 fort ; batterie/basse/accompagnement/nappe/melodie (true/false) : qui joue dans la partie.
 - notes (mélodie) : pour les parties qui ont une mélodie, la liste des notes [mesure, temps, durée, hauteur] :
   mesure de 0 à mesures-1 dans la partie, temps depuis 0 (0, 0.5, 1, 1.5…), durée en temps, hauteur MIDI 60 à 84.
   Une vraie mélodie : chantable, des phrases de 2 et 4 mesures, des notes de l'accord sur les temps forts, des
@@ -40,51 +53,55 @@ Règles :
 - son_melodie : programme General MIDI de l'instrument de la mélodie (73 flûte, 0 piano, 40 violon, 65 saxophone, 81 lead).
 """.trim()
 
-    private val SCHEMA = """
-{"type":"object","required":["titre","style","tempo","tonique","mineur","sections"],"properties":{
- "titre":{"type":"string"},"style":{"type":"string","enum":["pop","ballade","rock","valse","bossa","jazz"]},
- "tempo":{"type":"integer"},"tonique":{"type":"integer"},"mineur":{"type":"boolean"},"son_melodie":{"type":"integer"},
- "sections":{"type":"array","items":{"type":"object","required":["type","nom","mesures","accords"],"properties":{
-  "type":{"type":"string","enum":["intro","couplet","prerefrain","refrain","pont","solo","interlude","outro"]},
-  "nom":{"type":"string"},"mesures":{"type":"integer"},"accords":{"type":"array","items":{"type":"string"}},
-  "energie":{"type":"integer"},"batterie":{"type":"boolean"},"basse":{"type":"boolean"},"accompagnement":{"type":"boolean"},
-  "nappe":{"type":"boolean"},"melodie":{"type":"boolean"},
-  "notes":{"type":"array","items":{"type":"array","items":{"type":"number"}}}}}}}}
-""".trim()
-
     /** Un nouveau morceau d'après la demande. */
-    fun compose(request: String, key: String, model: String): Plan =
-        call("Demande de Bermet : « $request »", key, model).copy(request = request, source = "Claude")
+    fun compose(request: String, key: String, fast: Boolean): Plan =
+        call("Demande de Bermet : « $request »", key, fast).let { (p, who) -> p.copy(request = request, source = who) }
 
     /** Modifier le morceau en cours (« plus triste », « un refrain plus long », « change la mélodie du couplet »…). */
-    fun modify(plan: Plan, request: String, key: String, model: String): Plan =
+    fun modify(plan: Plan, request: String, key: String, fast: Boolean): Plan =
         call("Voici le morceau actuel (plan JSON) :\n${plan.toJson()}\n\nBermet demande de le modifier : « $request ». " +
-            "Renvoie le plan complet modifié (garde ce qu'elle n'a pas demandé de changer, y compris la mélodie).", key, model)
-            .copy(request = plan.request + " · " + request, source = "Claude", seed = plan.seed)
+            "Renvoie le plan complet modifié (garde ce qu'elle n'a pas demandé de changer, y compris la mélodie).", key, fast)
+            .let { (p, who) -> p.copy(request = plan.request + " · " + request, source = who, seed = plan.seed) }
 
-    private fun call(user: String, key: String, model: String): Plan {
-        val body = "{\"model\":${q(model)},\"max_tokens\":12000,\"temperature\":0.9,\"system\":${q(SYSTEM)}," +
-            "\"messages\":[{\"role\":\"user\",\"content\":${q(user)}}]," +
-            "\"tools\":[{\"name\":\"ecrire_morceau\",\"description\":\"Le plan complet du morceau.\",\"input_schema\":$SCHEMA}]," +
-            "\"tool_choice\":{\"type\":\"tool\",\"name\":\"ecrire_morceau\"}}"
-        val c = URL(URL_API).openConnection() as HttpURLConnection
+    /** Le meilleur modèle d'abord ; s'il est saturé ou inconnu, le rapide. Renvoie le plan et qui l'a écrit. */
+    private fun call(user: String, key: String, fast: Boolean): Pair<Plan, String> {
+        val p = providerFor(key)
+        val models = if (fast) listOf(p.fast) else listOf(p.best, p.fast)
+        var last: Failure? = null
+        for (m in models) {
+            try {
+                return request(p, m, user, key) to p.label
+            } catch (e: Failure) {
+                last = e
+                if (e.message?.startsWith("clé") == true || e.message == "pas de connexion") throw e
+            }
+        }
+        throw last ?: Failure("pas de réponse")
+    }
+
+    private fun request(p: Provider, model: String, user: String, key: String): Plan {
+        val body = "{\"model\":${q(model)},\"temperature\":0.9,\"max_tokens\":${p.maxTokens}," +
+            "\"response_format\":{\"type\":\"json_object\"}," +
+            "\"messages\":[{\"role\":\"system\",\"content\":${q(SYSTEM)}},{\"role\":\"user\",\"content\":${q(user)}}]}"
+        val c = URL(p.url).openConnection() as HttpURLConnection
         c.requestMethod = "POST"
         c.connectTimeout = 15000
         c.readTimeout = 120000
         c.doOutput = true
-        c.setRequestProperty("x-api-key", key.trim())
-        c.setRequestProperty("anthropic-version", "2023-06-01")
-        c.setRequestProperty("content-type", "application/json")
+        c.setRequestProperty("Authorization", "Bearer " + key.trim())
+        c.setRequestProperty("Content-Type", "application/json")
+        c.setRequestProperty("Accept", "application/json")
         try {
             c.outputStream.use { it.write(body.toByteArray(Charsets.UTF_8)) }
             val code = c.responseCode
             if (code != 200) {
                 throw Failure(when (code) {
-                    401 -> "clé refusée"
-                    403 -> "accès refusé"
+                    401 -> "clé refusée par ${p.label}"
+                    403 -> "accès refusé par ${p.label}"
                     404 -> "modèle inconnu ($model)"
-                    429 -> "trop de demandes, réessaie dans un instant"
-                    529, 503 -> "service saturé, réessaie dans un instant"
+                    413 -> "demande trop longue pour l'offre gratuite"
+                    429 -> "limite gratuite atteinte pour l'instant, réessaie dans une minute"
+                    500, 502, 503, 529 -> "${p.label} est saturé, réessaie dans un instant"
                     else -> "erreur $code"
                 })
             }
@@ -99,13 +116,16 @@ Règles :
         }
     }
 
-    /** La réponse de l'API → le plan (l'appel d'outil, ou à défaut un JSON dans le texte). */
+    /** La réponse (format « chat completions ») → le plan : le JSON du message, même entouré de texte ou de ```. */
     fun parseResponse(text: String): Plan {
         val m = Json.parse(text) as? Map<*, *> ?: throw Failure("réponse illisible")
-        val content = m["content"] as? List<*> ?: throw Failure("réponse vide")
-        val tool = content.mapNotNull { it as? Map<*, *> }.firstOrNull { it["type"] == "tool_use" }?.get("input") as? Map<*, *>
-        if (tool != null) return runCatching { Plan.fromMap(tool) }.getOrElse { throw Failure("plan incomplet") }
-        val txt = content.mapNotNull { (it as? Map<*, *>)?.get("text") as? String }.joinToString("\n")
+        val choice = (m["choices"] as? List<*>)?.firstOrNull() as? Map<*, *> ?: throw Failure("réponse vide")
+        val content = (choice["message"] as? Map<*, *>)?.get("content")
+        val txt = when (content) {
+            is String -> content
+            is List<*> -> content.mapNotNull { (it as? Map<*, *>)?.get("text") as? String }.joinToString("\n")
+            else -> ""
+        }
         val start = txt.indexOf('{')
         val end = txt.lastIndexOf('}')
         if (start >= 0 && end > start) return runCatching { Plan.fromJson(txt.substring(start, end + 1)) }.getOrElse { throw Failure("plan incomplet") }

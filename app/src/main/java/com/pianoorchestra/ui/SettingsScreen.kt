@@ -156,13 +156,13 @@ fun SettingsScreen(app: App, onBack: () -> Unit) {
     }
 }
 
-/** Claude en ligne : interrupteur, clé (jamais affichée en entier), choix du modèle. */
+/** L'IA gratuite en ligne (Mistral ou Groq) : interrupteur, clé (jamais affichée en entier), meilleur ou rapide. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AiPanel(app: App) {
     var enabled by remember { mutableStateOf(app.prefs.aiEnabled) }
     var key by remember { mutableStateOf(app.prefs.aiKey) }
-    var model by remember { mutableStateOf(app.prefs.aiModel) }
+    var fast by remember { mutableStateOf(app.prefs.aiFast) }
     var typing by remember { mutableStateOf("") }
     Panel(Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -179,7 +179,7 @@ private fun AiPanel(app: App) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Key, null, tint = Po.Teal, modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(10.dp))
-                    Text(stringResource(R.string.settings_ai_key_set) + "  ····" + key.takeLast(4), color = Po.Text, fontSize = 17.sp,
+                    Text(stringResource(R.string.settings_ai_key_set) + " (" + com.pianoorchestra.compose.OnlineComposer.providerFor(key).label + ")  ····" + key.takeLast(4), color = Po.Text, fontSize = 17.sp,
                         modifier = Modifier.weight(1f))
                     GlassPill(stringResource(R.string.settings_ai_clear)) { key = ""; app.prefs.aiKey = "" }
                 }
@@ -191,7 +191,7 @@ private fun AiPanel(app: App) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(Modifier.weight(1f)) {
-                        if (typing.isEmpty()) Text("sk-ant-…", color = Po.Muted, fontSize = 16.sp)
+                        if (typing.isEmpty()) Text("Mistral / gsk_… (Groq)", color = Po.Muted, fontSize = 16.sp)
                         BasicTextField(typing, { typing = it.trim() }, singleLine = true,
                             visualTransformation = PasswordVisualTransformation(),
                             textStyle = TextStyle(color = Po.Text, fontSize = 17.sp), cursorBrush = SolidColor(Po.Gold),
@@ -206,9 +206,8 @@ private fun AiPanel(app: App) {
                 Text(stringResource(R.string.settings_ai_key_hint), color = Po.Muted, fontSize = 15.sp)
             }
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                val ids = com.pianoorchestra.compose.OnlineComposer.MODELS
-                Chip(stringResource(R.string.settings_ai_model_best), model == ids[0]) { model = ids[0]; app.prefs.aiModel = ids[0] }
-                Chip(stringResource(R.string.settings_ai_model_fast), model == ids[1]) { model = ids[1]; app.prefs.aiModel = ids[1] }
+                Chip(stringResource(R.string.settings_ai_model_best), !fast) { fast = false; app.prefs.aiFast = false }
+                Chip(stringResource(R.string.settings_ai_model_fast), fast) { fast = true; app.prefs.aiFast = true }
             }
         }
     }

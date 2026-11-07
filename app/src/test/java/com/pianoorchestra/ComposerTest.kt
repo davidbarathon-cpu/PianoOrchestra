@@ -82,20 +82,21 @@ class ComposerTest {
     }
 
     @Test
-    fun readsAClaudeAnswer() {
-        val answer = """
-            {"id":"msg_1","type":"message","role":"assistant","content":[
-              {"type":"text","text":"Voici le morceau."},
-              {"type":"tool_use","id":"t1","name":"ecrire_morceau","input":{
-                "titre":"Neige sur Bichkek","style":"ballade","tempo":72,"tonique":9,"mineur":true,
-                "sections":[
-                  {"type":"intro","nom":"Intro","mesures":4,"accords":["Am","F","C","G"],"energie":1},
-                  {"type":"couplet","nom":"Couplet","mesures":8,"accords":["Am","F","C","G","Am","F","E7","Am"],
-                   "notes":[[0,0,1,69],[0,1,1,71],[0,2,2,72],[1,0,4,69]]},
-                  {"type":"refrain","nom":"Refrain","mesures":8,"accords":["F","G","C","Am"],"energie":3}
-                ]}}],
-             "stop_reason":"tool_use"}
+    fun readsAFreeAiAnswer() {
+        // le plan tel que Mistral ou Groq le renvoient : un JSON dans le message (ici entouré de ``` comme il arrive)
+        val inner = """
+            {"titre":"Neige sur Bichkek","style":"ballade","tempo":72,"tonique":9,"mineur":true,
+             "sections":[
+              {"type":"intro","nom":"Intro","mesures":4,"accords":["Am","F","C","G"],"energie":1},
+              {"type":"couplet","nom":"Couplet","mesures":8,"accords":["Am","F","C","G","Am","F","E7","Am"],
+               "notes":[[0,0,1,69],[0,1,1,71],[0,2,2,72],[1,0,4,69]]},
+              {"type":"refrain","nom":"Refrain","mesures":8,"accords":["F","G","C","Am"],"energie":3}
+             ]}
         """.trimIndent()
+        val content = ("```json\n" + inner + "\n```").replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n")
+        val answer = """{"id":"x","object":"chat.completion","choices":[{"index":0,"message":{"role":"assistant","content":"$content"},"finish_reason":"stop"}]}"""
+        assertEquals(OnlineComposer.Provider.GROQ, OnlineComposer.providerFor("gsk_abc123"))
+        assertEquals(OnlineComposer.Provider.MISTRAL, OnlineComposer.providerFor("AbCdEf0123456789AbCdEf0123456789"))
         val plan = OnlineComposer.parseResponse(answer)
         assertEquals("Neige sur Bichkek", plan.title)
         assertEquals(3, plan.parts.size)

@@ -5,7 +5,7 @@ import com.pianoorchestra.player.Json
 /**
  * Le plan d'un morceau composé sur la tablette : style, tonalité, tempo, et les parties (intro, couplets,
  * refrains, pont, fin) avec leurs accords mesure par mesure et, s'il y en a une, la mélodie.
- * Il est écrit par le moteur de la tablette ou par Claude en ligne, puis joué par l'arrangeur.
+ * Il est écrit par le moteur de la tablette ou par l'IA gratuite en ligne (Mistral ou Groq), puis joué par l'arrangeur.
  * Il est gardé à côté du MIDI (Titre.plan.json) : l'app y lit la grille, Riffmaker aussi.
  */
 data class Plan(
@@ -16,7 +16,7 @@ data class Plan(
     val key: Int,
     val minor: Boolean,
     val parts: List<Part>,
-    /** Qui l'a écrit : « tablette » ou « Claude ». */
+    /** Qui l'a écrit : « tablette », « Mistral » ou « Groq ». */
     val source: String = "tablette",
     /** La demande de départ, et ce qui a été demandé ensuite. */
     val request: String = "",
@@ -37,7 +37,7 @@ data class Plan(
         val comp: Boolean = true,
         val pad: Boolean = false,
         val melody: Boolean = true,
-        /** La mélodie écrite note par note (Claude), sinon la tablette l'invente. */
+        /** La mélodie écrite note par note (IA en ligne), sinon la tablette l'invente. */
         val notes: List<Note>? = null,
     )
 
@@ -77,7 +77,7 @@ data class Plan(
 
         private fun q(s: String) = "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ") + "\""
 
-        /** Lire un plan (le nôtre, ou celui que Claude a écrit : mêmes clés). Les valeurs folles sont ramenées au raisonnable. */
+        /** Lire un plan (le nôtre, ou celui de l'IA en ligne : mêmes clés). Les valeurs folles sont ramenées au raisonnable. */
         fun fromJson(text: String): Plan = fromMap(Json.parse(text) as? Map<*, *> ?: error("plan illisible"))
 
         fun fromMap(m: Map<*, *>): Plan {

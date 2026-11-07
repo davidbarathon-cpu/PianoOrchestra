@@ -35,7 +35,7 @@ class ExchangeServer(
     private val info: () -> Map<String, Any>,
     private val page: () -> ByteArray,
     private val onEvent: (Event) -> Unit = {},
-    /** Un réglage envoyé par l'ordinateur (la clé de Claude pour le compositeur). Renvoie true s'il est accepté. */
+    /** Un réglage envoyé par l'ordinateur (la clé de l'IA en ligne pour le compositeur). Renvoie true s'il est accepté. */
     private val settings: (String, String) -> Boolean = { _, _ -> false },
 ) {
     data class FileInfo(val name: String, val size: Long, val modified: Long, val kind: String)

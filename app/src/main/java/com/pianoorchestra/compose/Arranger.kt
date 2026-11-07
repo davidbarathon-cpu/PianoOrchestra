@@ -9,7 +9,7 @@ import kotlin.random.Random
 /**
  * L'arrangeur : joue le plan avec le groupe de la tablette (les mêmes styles que le jeu libre) et écrit
  * un fichier MIDI complet — mélodie, piano, basse, batterie, nappe — avec les parties en marqueurs.
- * La mélodie, si Claude ne l'a pas écrite, est inventée ici : des motifs de deux mesures, les notes de
+ * La mélodie, si l'IA en ligne ne l'a pas écrite, est inventée ici : des motifs de deux mesures, les notes de
  * l'accord sur les temps forts, des pas de gamme entre les deux ; un couplet revient avec la même mélodie.
  */
 object Arranger {
@@ -111,7 +111,7 @@ object Arranger {
             }
             // la mélodie
             if (part.melody) {
-                // une mélodie écrite (Claude) sert aussi aux parties du même type qui reviennent
+                // une mélodie écrite (IA en ligne) sert aussi aux parties du même type qui reviennent
                 val notes = part.notes?.also { melodies[part.type] = it } ?: melodies.getOrPut(part.type) {
                     melody(plan, part, beats, scale, lastPitch, Random(plan.seed * 31 + part.type.hashCode()))
                 }
