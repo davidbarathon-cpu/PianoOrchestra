@@ -66,6 +66,20 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/** Le nom du style d'une composition, en français ou en russe. */
+private fun composerStyle(id: String, lang: String): String {
+    val ru = lang == "ru"
+    return when (id) {
+        "pop" -> if (ru) "Поп" else "Pop"
+        "ballade" -> if (ru) "Баллада" else "Ballade"
+        "rock" -> if (ru) "Рок" else "Rock"
+        "valse" -> if (ru) "Вальс" else "Valse"
+        "bossa" -> if (ru) "Босса-нова" else "Bossa nova"
+        "jazz" -> if (ru) "Джаз" else "Jazz"
+        else -> id.replaceFirstChar { it.uppercase() }
+    }
+}
+
 /** Couleur de chaque type de partie, dans la structure du morceau. */
 private fun partColor(type: String): Color = when (type) {
     "intro", "outro" -> Color(0xFF9CA3C8)
@@ -213,7 +227,7 @@ fun ComposerScreen(app: App, lang: String, onBack: () -> Unit, onPlayAlong: (Str
                     } else Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                         Text(p.title, color = Po.Text, fontSize = 32.sp, fontWeight = FontWeight.Medium, lineHeight = 36.sp)
                         val secs = render?.seconds ?: 0.0
-                        Text("${styleName(p.style, lang)} · ${p.keyName(lang)} · ${p.tempo} BPM · ${MusicText.time(secs)} · " +
+                        Text("${composerStyle(p.style, lang)} · ${p.keyName(lang)} · ${p.tempo} BPM · ${MusicText.time(secs)} · " +
                             stringResource(if (p.source == "Claude") R.string.composer_by_claude else R.string.composer_by_tablet),
                             color = Po.Gold, fontSize = 16.sp)
                         note?.let { Text(stringResource(R.string.composer_fallback, it), color = Po.Muted, fontSize = 14.sp) }
