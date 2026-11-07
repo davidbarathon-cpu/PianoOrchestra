@@ -40,6 +40,16 @@ class Prefs(context: Context) {
     var lastSong: String?
         get() = sp.getString("last_song", null)
         set(v) { sp.edit().putString("last_song", v).apply() }
+    /** Claude en ligne pour le compositeur : la clé (donnée par David, ou envoyée par Riffmaker) et le modèle. */
+    var aiKey: String
+        get() = sp.getString("ai_key", "") ?: ""
+        set(v) { sp.edit().putString("ai_key", v.trim()).apply() }
+    var aiModel: String
+        get() = sp.getString("ai_model", com.pianoorchestra.compose.OnlineComposer.MODELS[0]) ?: com.pianoorchestra.compose.OnlineComposer.MODELS[0]
+        set(v) { sp.edit().putString("ai_model", v).apply() }
+    var aiEnabled: Boolean
+        get() = sp.getBoolean("ai_enabled", true)
+        set(v) { sp.edit().putBoolean("ai_enabled", v).apply() }
     /** Calage du carnet sur le son du groupe, par chanson (secondes, + = le carnet attend). */
     fun carnetOffset(id: String): Float = sp.getFloat("offset_$id", 0f)
     fun setCarnetOffset(id: String, v: Float) { sp.edit().putFloat("offset_$id", v).apply() }
@@ -223,10 +233,55 @@ class App : Application() {
             info = { mapOf("app" to "Piano Orchestra", "name" to getString(R.string.exchange_device_name),
                 "version" to BuildConfig.VERSION_NAME) },
             page = { assets.open("exchange/index.html").use { it.readBytes() } },
+            settings = { name, value ->
+                when (name) {
+                    "ai-key" -> { prefs.aiKey = value; prefs.aiEnabled = true; true }     // envoyée par Riffmaker
+                    else -> false
+                }
+            },
             onEvent = { e ->
                 exchangeLog.value = (listOf(ExchangeLog(e.kind, e.name, e.from, System.currentTimeMillis())) + exchangeLog.value).take(60)
                 if (e.kind == com.pianoorchestra.exchange.ExchangeServer.Kind.RECEIVED) libraryVersion.value++
             })
+    }
+
+    // ------------------------------------------------------------------ le compositeur
+    /** Le résultat d'une composition : le plan, et pourquoi l'IA en ligne n'a pas servi (s'il y a lieu). */
+    class Composed(val plan: com.pianoorchestra.compose.Plan, val note: String?)
+
+    val aiReady: Boolean get() = prefs.aiEnabled && prefs.aiKey.isNotBlank()
+
+    /** Composer d'après une demande : Claude si possible, sinon le compositeur de la tablette. Hors du fil principal. */
+    fun compose(request: String, seed: Long = System.nanoTime()): Composed {
+        if (aiReady) {
+            try {
+                return Composed(com.pianoorchestra.compose.OnlineComposer.compose(request, prefs.aiKey, prefs.aiModel), null)
+            } catch (e: com.pianoorchestra.compose.OnlineComposer.Failure) {
+                val offline = com.pianoorchestra.compose.Composer.compose(com.pianoorchestra.compose.Composer.read(request), seed)
+                return Composed(offline, e.message)
+            }
+        }
+        return Composed(com.pianoorchestra.compose.Composer.compose(com.pianoorchestra.compose.Composer.read(request), seed), null)
+    }
+
+    /** Modifier le morceau en cours. Null : la tablette n'a pas compris (sans IA). */
+    fun modify(plan: com.pianoorchestra.compose.Plan, request: String): Composed? {
+        if (aiReady) {
+            try {
+                return Composed(com.pianoorchestra.compose.OnlineComposer.modify(plan, request, prefs.aiKey, prefs.aiModel), null)
+            } catch (e: com.pianoorchestra.compose.OnlineComposer.Failure) {
+                return com.pianoorchestra.compose.Composer.modify(plan, request)?.let { Composed(it, e.message) }
+            }
+        }
+        return com.pianoorchestra.compose.Composer.modify(plan, request)?.let { Composed(it, null) }
+    }
+
+    /** Garder un morceau composé dans « Mes morceaux » : le MIDI et sa grille. Renvoie l'identifiant à ouvrir. */
+    fun saveComposition(plan: com.pianoorchestra.compose.Plan, midi: ByteArray, planJson: String): String {
+        val name = library.saveNamed(midi, plan.title, "mid")
+        runCatching { java.io.File(library.songsDir, "$name.plan.json").writeText(planJson) }
+        libraryVersion.value++
+        return "file:$name.mid"
     }
 
     fun startExchange(): Int {

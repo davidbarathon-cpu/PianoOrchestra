@@ -17,7 +17,8 @@ object MidiWriter {
     private const val TPQ = 480
 
     /** [bpm] et [beatsPerBar] : pour que les mesures tombent juste (compositions avec le groupe). */
-    fun write(tracks: List<Track>, title: String, bpm: Double = 120.0, beatsPerBar: Int = 4): ByteArray {
+    fun write(tracks: List<Track>, title: String, bpm: Double = 120.0, beatsPerBar: Int = 4,
+              markers: List<Pair<Double, String>> = emptyList()): ByteArray {
         val BPM = bpm.coerceIn(20.0, 300.0)
         val usPerBeat = (60_000_000.0 / BPM).toInt()
         val out = ByteArrayOutputStream()
@@ -29,6 +30,13 @@ object MidiWriter {
         meta(conductor, 0, 0x03, title.toByteArray(Charsets.UTF_8))
         meta(conductor, 0, 0x51, byteArrayOf((usPerBeat shr 16).toByte(), (usPerBeat shr 8).toByte(), usPerBeat.toByte()))
         meta(conductor, 0, 0x58, byteArrayOf(beatsPerBar.coerceIn(1, 16).toByte(), 2, 24, 8))
+        // les parties du morceau (Intro, Couplet 1…) : des marqueurs, que l'app et Riffmaker relisent
+        var lastM = 0L
+        for ((t, name) in markers.sortedBy { it.first }) {
+            val tick = (t.coerceAtLeast(0.0) * TPQ * BPM / 60.0).toLong()
+            meta(conductor, tick - lastM, 0x06, name.toByteArray(Charsets.UTF_8))
+            lastM = tick
+        }
         meta(conductor, 0, 0x2F, ByteArray(0))
         chunk(out, conductor.toByteArray())
 

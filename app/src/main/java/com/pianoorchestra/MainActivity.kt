@@ -25,6 +25,7 @@ import com.pianoorchestra.ui.PlayAlongScreen
 import com.pianoorchestra.ui.PoTheme
 import com.pianoorchestra.ui.CatalogScreen
 import com.pianoorchestra.ui.ExchangeScreen
+import com.pianoorchestra.ui.ComposerScreen
 import com.pianoorchestra.ui.Po
 import com.pianoorchestra.ui.Ambiance
 import com.pianoorchestra.ui.Screen
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
         }
         intent.getStringExtra("po_ambiance")?.let { app.prefs.ambiance = it }
         Po.ambiance = Ambiance.of(app.prefs.ambiance)
+        val autoCompose = intent.getStringExtra("po_compose")
         val startScreen = intent.getStringExtra("po_screen")?.let { s -> Screen.entries.firstOrNull { it.name.equals(s, true) } }
         val autoSong = intent.getIntExtra("po_song", -1)
         val autoPlay = intent.getBooleanExtra("po_autoplay", false)
@@ -90,6 +92,8 @@ class MainActivity : ComponentActivity() {
                         Screen.FREEPLAY -> FreePlayScreen(app, lang) { screen = Screen.HOME }
                         Screen.SETTINGS -> SettingsScreen(app) { screen = Screen.HOME }
                         Screen.EXCHANGE -> ExchangeScreen(app) { screen = Screen.HOME }
+                        Screen.COMPOSER -> ComposerScreen(app, lang, onBack = { screen = Screen.HOME },
+                            onPlayAlong = { id -> resumeId = id; screen = Screen.PLAYALONG }, autoRequest = autoCompose)
                         Screen.CATALOG -> CatalogScreen(app, lang, onBack = { screen = catalogBack },
                             onOpen = { id -> resumeId = id; screen = Screen.PLAYALONG })
                     }

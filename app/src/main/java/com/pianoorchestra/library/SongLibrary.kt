@@ -105,6 +105,16 @@ class SongLibrary(private val context: Context) {
         return song
     }
 
+    /** Range un fichier sous un nom lisible (« Titre », « Titre (2) »…). Renvoie le nom sans extension. */
+    fun saveNamed(bytes: ByteArray, title: String, ext: String): String {
+        val base = title.replace(Regex("[\\\\/:*?\"<>|]"), "_").take(80).ifBlank { "morceau" }
+        var name = base
+        var k = 2
+        while (File(dir, "$name.$ext").exists()) { name = "$base ($k)"; k++ }
+        File(dir, "$name.$ext").writeBytes(bytes)
+        return name
+    }
+
     /** Garde un enregistrement dans « Mes morceaux ». Renvoie son titre. */
     fun saveRecording(bytes: ByteArray, base: String): String {
         val stamp = java.text.SimpleDateFormat("d MMM HH'h'mm", java.util.Locale.FRANCE).format(java.util.Date())

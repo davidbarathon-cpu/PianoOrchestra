@@ -92,3 +92,78 @@ object ChordDetector {
 
     private fun chord(root: Int, t: Template) = Chord(root, t.intervals, t.suffix)
 }
+
+/** Lire un nom d'accord écrit (« Am7 », « F#m », « Bb », « C/E », « Sol7 »…) : fondamentale, intervalles, basse. */
+object ChordName {
+    private val SUFFIXES: List<Pair<String, IntArray>> = listOf(
+        "maj9" to intArrayOf(0, 4, 7, 11, 14), "maj7" to intArrayOf(0, 4, 7, 11), "m7b5" to intArrayOf(0, 3, 6, 10),
+        "madd9" to intArrayOf(0, 3, 7, 14), "add9" to intArrayOf(0, 4, 7, 14), "7sus4" to intArrayOf(0, 5, 7, 10),
+        "sus4" to intArrayOf(0, 5, 7), "sus2" to intArrayOf(0, 2, 7), "dim7" to intArrayOf(0, 3, 6, 9),
+        "dim" to intArrayOf(0, 3, 6), "aug" to intArrayOf(0, 4, 8), "m9" to intArrayOf(0, 3, 7, 10, 14),
+        "m7" to intArrayOf(0, 3, 7, 10), "m6" to intArrayOf(0, 3, 7, 9), "mM7" to intArrayOf(0, 3, 7, 11),
+        "m" to intArrayOf(0, 3, 7), "9" to intArrayOf(0, 4, 7, 10, 14), "7" to intArrayOf(0, 4, 7, 10),
+        "6" to intArrayOf(0, 4, 7, 9), "5" to intArrayOf(0, 7), "" to intArrayOf(0, 4, 7),
+    )
+    private val LETTERS = mapOf('C' to 0, 'D' to 2, 'E' to 4, 'F' to 5, 'G' to 7, 'A' to 9, 'B' to 11, 'H' to 11)
+    private val SOLFEGE = listOf("do" to 0, "ré" to 2, "re" to 2, "mi" to 4, "fa" to 5, "sol" to 7, "la" to 9, "si" to 11)
+
+    /** La fondamentale d'un nom (lettre ou do-ré-mi) et ce qui reste après. */
+    fun root(s: String): Pair<Int, String>? {
+        if (s.isEmpty()) return null
+        var pc: Int
+        var rest: String
+        val low = s.lowercase()
+        val sol = SOLFEGE.firstOrNull { low.startsWith(it.first) }
+        if (sol != null && (s.length == sol.first.length || !s[sol.first.length].isLetter() || s[sol.first.length] == 'm')) {
+            pc = sol.second; rest = s.substring(sol.first.length)
+        } else {
+            pc = LETTERS[s[0].uppercaseChar()] ?: return null
+            rest = s.substring(1)
+        }
+        when {
+            rest.startsWith("#") || rest.startsWith("♯") -> { pc += 1; rest = rest.substring(1) }
+            rest.startsWith("b") || rest.startsWith("♭") -> { pc -= 1; rest = rest.substring(1) }
+        }
+        return Math.floorMod(pc, 12) to rest
+    }
+
+    /** Renvoie (accord, basse) ou null si le nom ne se lit pas. */
+    fun parse(name: String): Pair<Chord, Int?>? {
+        val n = name.trim()
+        if (n.isEmpty()) return null
+        val slash = n.indexOf('/')
+        val main = if (slash > 0) n.substring(0, slash) else n
+        val bass = if (slash > 0) root(n.substring(slash + 1))?.first else null
+        val (pc, rest0) = root(main) ?: return null
+        val rest = rest0.replace("min", "m").replace("maj", "maj").replace("M7", "maj7").replace("°", "dim").replace("+", "aug")
+        val suffix = SUFFIXES.firstOrNull { rest == it.first } ?: SUFFIXES.firstOrNull { rest.startsWith(it.first) && it.first.isNotEmpty() }
+            ?: SUFFIXES.last()
+        return Chord(pc, suffix.second.map { it % 12 }.distinct().toIntArray(), suffix.first) to bass
+    }
+
+    private val SHARPS = arrayOf("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+    private val FLATS = arrayOf("C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B")
+
+    /** Les noms de notes de la tonalité : dièses en sol, ré, la, mi, si ; bémols en fa, si♭, mi♭, la♭, ré♭, sol♭. */
+    fun spelling(key: Int, minor: Boolean): Array<String> {
+        val major = Math.floorMod(if (minor) key + 3 else key, 12)
+        return when (major) {
+            7, 2, 9, 4, 11 -> SHARPS
+            5, 10, 3, 8, 1, 6 -> FLATS
+            else -> Chord.NAMES
+        }
+    }
+
+    /** Transposer un nom d'accord de [semis] demi-tons (C/E +2 → D/F#). */
+    fun transpose(name: String, semis: Int, names: Array<String> = Chord.NAMES): String {
+        if (semis == 0 || name.isBlank()) return name
+        return name.split(' ').joinToString(" ") { one ->
+            val slash = one.indexOf('/')
+            fun t(part: String): String {
+                val (pc, rest) = root(part) ?: return part
+                return names[Math.floorMod(pc + semis, 12)] + rest
+            }
+            if (slash > 0) t(one.substring(0, slash)) + "/" + t(one.substring(slash + 1)) else t(one)
+        }
+    }
+}

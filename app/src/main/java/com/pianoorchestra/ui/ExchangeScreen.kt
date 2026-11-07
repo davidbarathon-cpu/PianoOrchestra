@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Upload
 import androidx.compose.material.icons.rounded.WifiOff
@@ -210,6 +211,7 @@ private fun LogRow(e: App.ExchangeLog) {
         ExchangeServer.Kind.BACKUP -> Triple(Icons.Rounded.Inventory2, Po.Gold, R.string.exchange_backup)
         ExchangeServer.Kind.REFUSED -> Triple(Icons.Rounded.Block, Po.Danger, R.string.exchange_refused)
         ExchangeServer.Kind.CONNECTED -> Triple(Icons.Rounded.Link, Color(0xFFB9A6FF), R.string.exchange_connected)
+        ExchangeServer.Kind.SETTING -> Triple(Icons.Rounded.Key, Po.Gold, R.string.exchange_setting)
     }
     val time = remember(e.time) { java.text.SimpleDateFormat("HH:mm", java.util.Locale.FRANCE).format(java.util.Date(e.time)) }
     Row(

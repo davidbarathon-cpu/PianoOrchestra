@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.LibraryMusic
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.MusicNote
@@ -160,9 +161,10 @@ fun HomeScreen(app: App, lang: String, onLang: (String) -> Unit, onOpen: (Screen
                 }
             }
 
-            // les quatre grandes portes
+            // les cinq grandes portes
             val cards = listOf<@Composable (Modifier) -> Unit>(
                 { m -> BigCard(Icons.Rounded.LibraryMusic, stringResource(R.string.menu_playalong), stringResource(R.string.menu_playalong_sub), m) { onOpen(Screen.PLAYALONG) } },
+                { m -> BigCard(Icons.Rounded.AutoAwesome, stringResource(R.string.menu_composer), stringResource(R.string.menu_composer_sub), m, accent = Color(0xFFFFB3CF)) { onOpen(Screen.COMPOSER) } },
                 { m -> BigCard(Icons.Rounded.MusicNote, stringResource(R.string.menu_freeplay), stringResource(R.string.menu_freeplay_sub), m, accent = Color(0xFFB9A6FF)) { onOpen(Screen.FREEPLAY) } },
                 { m -> BigCard(Icons.Rounded.Piano, stringResource(R.string.menu_keyboard), stringResource(R.string.menu_keyboard_sub), m, accent = Po.Teal) { onOpen(Screen.KEYBOARD) } },
                 { m -> BigCard(Icons.Rounded.Tune, stringResource(R.string.menu_settings), stringResource(R.string.menu_settings_sub), m, accent = Po.Text) { onOpen(Screen.SETTINGS) } },

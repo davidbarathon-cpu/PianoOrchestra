@@ -50,6 +50,16 @@ import androidx.compose.ui.unit.sp
 import com.pianoorchestra.App
 import com.pianoorchestra.R
 import com.pianoorchestra.update.Updater
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
 fun SettingsScreen(app: App, onBack: () -> Unit) {
@@ -108,6 +118,7 @@ fun SettingsScreen(app: App, onBack: () -> Unit) {
                     Text(stringResource(R.string.audio_output_hint), color = Po.Muted, fontSize = 15.sp, modifier = Modifier.padding(top = 8.dp))
                 }
             }
+            AiPanel(app)
             Panel(Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     SectionTitle(stringResource(R.string.updates_title))
@@ -141,6 +152,64 @@ fun SettingsScreen(app: App, onBack: () -> Unit) {
                 }
             }
             Text(stringResource(R.string.credits), color = Po.Muted, fontSize = 14.sp, modifier = Modifier.padding(bottom = 24.dp))
+        }
+    }
+}
+
+/** Claude en ligne : interrupteur, clé (jamais affichée en entier), choix du modèle. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AiPanel(app: App) {
+    var enabled by remember { mutableStateOf(app.prefs.aiEnabled) }
+    var key by remember { mutableStateOf(app.prefs.aiKey) }
+    var model by remember { mutableStateOf(app.prefs.aiModel) }
+    var typing by remember { mutableStateOf("") }
+    Panel(Modifier.fillMaxWidth()) {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionTitle(stringResource(R.string.settings_ai))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.settings_ai_on), color = Po.Text, fontSize = 19.sp)
+                    Text(stringResource(R.string.settings_ai_on_sub), color = Po.Muted, fontSize = 15.sp)
+                }
+                Switch(enabled, { enabled = it; app.prefs.aiEnabled = it },
+                    colors = SwitchDefaults.colors(checkedThumbColor = Po.Night, checkedTrackColor = Po.Gold, uncheckedTrackColor = Po.CardHigh))
+            }
+            if (key.isNotBlank()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Rounded.Key, null, tint = Po.Teal, modifier = Modifier.size(22.dp))
+                    Spacer(Modifier.width(10.dp))
+                    Text(stringResource(R.string.settings_ai_key_set) + "  ····" + key.takeLast(4), color = Po.Text, fontSize = 17.sp,
+                        modifier = Modifier.weight(1f))
+                    GlassPill(stringResource(R.string.settings_ai_clear)) { key = ""; app.prefs.aiKey = "" }
+                }
+            } else {
+                Text(stringResource(R.string.settings_ai_key), color = Po.Text, fontSize = 17.sp)
+                Row(
+                    Modifier.fillMaxWidth().clip(RoundedCornerShape(50)).background(Color.Black.copy(alpha = 0.22f))
+                        .border(1.dp, Po.Stroke, RoundedCornerShape(50)).padding(start = 20.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(Modifier.weight(1f)) {
+                        if (typing.isEmpty()) Text("sk-ant-…", color = Po.Muted, fontSize = 16.sp)
+                        BasicTextField(typing, { typing = it.trim() }, singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            textStyle = TextStyle(color = Po.Text, fontSize = 17.sp), cursorBrush = SolidColor(Po.Gold),
+                            modifier = Modifier.fillMaxWidth())
+                    }
+                    Box(
+                        Modifier.size(44.dp).clip(CircleShape).background(Po.accentBrush)
+                            .clickable(enabled = typing.length > 10) { app.prefs.aiKey = typing; key = typing; typing = "" },
+                        contentAlignment = Alignment.Center
+                    ) { Icon(Icons.Rounded.Check, null, tint = Po.Night) }
+                }
+                Text(stringResource(R.string.settings_ai_key_hint), color = Po.Muted, fontSize = 15.sp)
+            }
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                val ids = com.pianoorchestra.compose.OnlineComposer.MODELS
+                Chip(stringResource(R.string.settings_ai_model_best), model == ids[0]) { model = ids[0]; app.prefs.aiModel = ids[0] }
+                Chip(stringResource(R.string.settings_ai_model_fast), model == ids[1]) { model = ids[1]; app.prefs.aiModel = ids[1] }
+            }
         }
     }
 }

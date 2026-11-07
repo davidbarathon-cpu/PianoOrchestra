@@ -30,6 +30,8 @@ for lang in fr ru; do
   WAIT=14 shot "tablette-${lang}-8-partition" --es po_lang $lang --ei po_song 100
   WAIT=8 shot "tablette-${lang}-10-echange" --es po_lang $lang --es po_screen exchange
   WAIT=8 shot "tablette-${lang}-9-catalogue" --es po_lang $lang --es po_screen catalog
+  WAIT=8 shot "tablette-${lang}-17-compositeur" --es po_lang $lang --es po_screen composer
+  WAIT=12 shot "tablette-${lang}-18-composition" --es po_lang $lang --es po_screen composer --es po_compose 1
   WAIT=12 shot "tablette-${lang}-7-jeu-libre" --es po_lang $lang --es po_screen freeplay --es po_chord 45,48,52
 done
 
@@ -81,6 +83,7 @@ adb shell wm density 420
 sleep 3
 shot "telephone-fr-1-accueil" --es po_lang fr --es po_screen home
 shot "telephone-fr-2-clavier" --es po_lang fr --es po_screen keyboard
+WAIT=12 shot "telephone-fr-4-composition" --es po_lang fr --es po_screen composer --es po_compose 3
 WAIT=10 shot "telephone-fr-3-groupe" --es po_lang fr --ei po_song 0
 adb shell wm size reset
 adb shell wm density reset

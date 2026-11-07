@@ -35,6 +35,8 @@ class ExchangeServer(
     private val info: () -> Map<String, Any>,
     private val page: () -> ByteArray,
     private val onEvent: (Event) -> Unit = {},
+    /** Un réglage envoyé par l'ordinateur (la clé de Claude pour le compositeur). Renvoie true s'il est accepté. */
+    private val settings: (String, String) -> Boolean = { _, _ -> false },
 ) {
     data class FileInfo(val name: String, val size: Long, val modified: Long, val kind: String)
 
@@ -46,7 +48,7 @@ class ExchangeServer(
         fun save(name: String, data: InputStream, length: Long, replace: Boolean): String?
     }
 
-    enum class Kind { CONNECTED, RECEIVED, SENT, BACKUP, REFUSED }
+    enum class Kind { CONNECTED, RECEIVED, SENT, BACKUP, REFUSED, SETTING }
     data class Event(val kind: Kind, val name: String, val from: String)
 
     @Volatile private var server: ServerSocket? = null
@@ -202,6 +204,14 @@ class ExchangeServer(
                     sendFile(out, f)
                     onEvent(Event(Kind.SENT, f.name, from))
                 }
+            }
+            (r.method == "PUT" || r.method == "POST") && r.path.startsWith("/api/settings/") -> {
+                val len = r.length
+                if (len !in 1..4096) { respondJson(out, 413, json(mapOf("error" to "taille"))); return }
+                val value = Limited(r.body, len).readBytes().toString(Charsets.UTF_8).trim()
+                val ok = settings(r.path.removePrefix("/api/settings/"), value)
+                if (ok) onEvent(Event(Kind.SETTING, r.path.removePrefix("/api/settings/"), from))
+                respondJson(out, if (ok) 200 else 404, json(mapOf("ok" to ok)))
             }
             (r.method == "PUT" || r.method == "POST") && r.path.startsWith("/api/files/") -> {
                 val name = r.path.removePrefix("/api/files/")
