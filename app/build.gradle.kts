@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.pianoorchestra"
-        minSdk = 31
+        minSdk = 29
         targetSdk = 35
         versionCode = buildNumber
         versionName = "0.1.$buildNumber"
@@ -38,6 +38,13 @@ android {
             signingConfig = if (keystorePath != null) signingConfigs.getByName("release")
                             else signingConfigs.getByName("debug")
         }
+    }
+
+    // la tablette de Bermet : HUAWEI MatePad 11.5 S sous HarmonyOS 4.3 (compatible Android 12) ;
+    // minSdk 29 pour être sûr qu'elle s'installe, et la compilation échoue si une fonction plus récente est utilisée
+    lint {
+        fatal += "NewApi"
+        checkReleaseBuilds = true
     }
 
     compileOptions {
